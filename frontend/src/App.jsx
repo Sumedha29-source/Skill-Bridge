@@ -13,6 +13,8 @@ import StudentLayout from "./layouts/StudentLayout";
 import RecruiterLayout from "./layouts/RecruiterLayout";
 import CollegeLayout from "./layouts/CollegeLayout";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <BrowserRouter>
@@ -24,17 +26,38 @@ function App() {
         <Route path="/select-role" element={<RoleSelection />} />
 
         {/* Student portal */}
-        <Route path="/student" element={<StudentLayout />}>
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<StudentDashboard />} />
         </Route>
 
         {/* Recruiter portal */}
-        <Route path="/recruiter" element={<RecruiterLayout />}>
+        <Route
+          path="/recruiter"
+          element={
+            <ProtectedRoute allowedRole="recruiter">
+              <RecruiterLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<RecruiterDashboard />} />
         </Route>
 
         {/* College portal */}
-        <Route path="/college" element={<CollegeLayout />}>
+        <Route
+          path="/college"
+          element={
+            <ProtectedRoute allowedRole="college">
+              <CollegeLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<CollegeDashboard />} />
         </Route>
       </Routes>
