@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../services/supabase";
 
 function Login() {
@@ -17,27 +17,101 @@ function Login() {
     setError("");
     setLoading(true);
 
+    // ---------------------------------------------
+    // 1. LOGIN USING SUPABASE AUTH
+    // ---------------------------------------------
+
     const { data, error: loginError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-    setLoading(false);
-
-    // If Supabase rejects the login
     if (loginError) {
+      setLoading(false);
       setError(loginError.message);
       return;
     }
 
-    // If login succeeds
-    if (data.user) {
-      console.log("Login successful:", data.user);
+    const user = data.user;
 
-      // Send user to landing page for now
-      navigate("/select-role");
+    // ---------------------------------------------
+    // 2. CHECK SKILLBRIDGE PROFILE
+    // ---------------------------------------------
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role, onboarding_completed")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      setLoading(false);
+      setError(profileError.message);
+      return;
     }
+
+    // ---------------------------------------------
+    // 3. USER HAS NOT SELECTED ROLE YET
+    // ---------------------------------------------
+
+    if (!profile) {
+      setLoading(false);
+      navigate("/select-role");
+      return;
+    }
+
+    // ---------------------------------------------
+    // 4. STUDENT
+    // ---------------------------------------------
+
+    if (profile.role === "student") {
+      setLoading(false);
+
+      if (profile.onboarding_completed) {
+        navigate("/student");
+      } else {
+        navigate("/student/onboarding");
+      }
+
+      return;
+    }
+
+    // ---------------------------------------------
+    // 5. RECRUITER
+    // ---------------------------------------------
+
+    if (profile.role === "recruiter") {
+      setLoading(false);
+
+      if (profile.onboarding_completed) {
+        navigate("/recruiter");
+      } else {
+        navigate("/recruiter/onboarding");
+      }
+
+      return;
+    }
+
+    // ---------------------------------------------
+    // 6. COLLEGE
+    // ---------------------------------------------
+
+    if (profile.role === "college") {
+      setLoading(false);
+
+      if (profile.onboarding_completed) {
+        navigate("/college");
+      } else {
+        navigate("/college/onboarding");
+      }
+
+      return;
+    }
+
+    // Invalid role just in case
+    setLoading(false);
+    setError("Invalid account role.");
   }
 
   return (
@@ -82,13 +156,11 @@ function Login() {
         </button>
       </form>
 
-      {error && (
-        <p>
-          {error}
-        </p>
-      )}
+      {error && <p>{error}</p>}
 
-      <p>Don't have an account? Create one</p>
+      <p>
+  Don't have an account? <Link to="/signup">Create one</Link>
+</p>
     </div>
   );
 }

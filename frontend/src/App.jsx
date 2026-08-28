@@ -1,11 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import RecruiterOnboarding from "./pages/recruiter/Onboarding";
+import CollegeOnboarding from "./pages/college/Onboarding";
+import DepartmentSetup from "./pages/college/DepartmentSetup";
+
 import Landing from "./pages/public/Landing";
 import Signup from "./pages/public/Signup";
 import Login from "./pages/public/Login";
 import RoleSelection from "./pages/public/RoleSelection";
 
 import StudentDashboard from "./pages/student/Dashboard";
+import StudentOnboarding from "./pages/student/Onboarding";
+
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import CollegeDashboard from "./pages/college/Dashboard";
 
@@ -35,6 +41,7 @@ function App() {
           }
         >
           <Route index element={<StudentDashboard />} />
+          <Route path="onboarding" element={<StudentOnboarding />} />
         </Route>
 
         {/* Recruiter portal */}
@@ -47,6 +54,7 @@ function App() {
           }
         >
           <Route index element={<RecruiterDashboard />} />
+          <Route path="onboarding" element={<RecruiterOnboarding />} />
         </Route>
 
         {/* College portal */}
@@ -59,6 +67,8 @@ function App() {
           }
         >
           <Route index element={<CollegeDashboard />} />
+          <Route path="onboarding" element={<CollegeOnboarding />} />
+          <Route path="departments" element={<DepartmentSetup />} />
         </Route>
       </Routes>
     </BrowserRouter>

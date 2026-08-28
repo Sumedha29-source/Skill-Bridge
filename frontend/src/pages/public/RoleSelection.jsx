@@ -25,29 +25,71 @@ function RoleSelection() {
     }
 
     // Create the user's SkillBridge profile
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({
-        id: user.id,
-        full_name: user.user_metadata?.full_name || "SkillBridge User",
-        email: user.email,
-        role: role,
-        onboarding_completed: false,
-      });
+   // Check whether this user already has a SkillBridge profile
+const { data: existingProfile, error: checkError } = await supabase
+  .from("profiles")
+  .select("role, onboarding_completed")
+  .eq("id", user.id)
+  .maybeSingle();
 
-    if (profileError) {
-      setLoading(false);
-      setError(profileError.message);
-      return;
-    }
+if (checkError) {
+  setLoading(false);
+  setError(checkError.message);
+  return;
+}
 
+// If profile already exists, don't create another one
+if (existingProfile) {
+  setLoading(false);
+
+  if (existingProfile.role === "student") {
+    navigate(
+      existingProfile.onboarding_completed
+        ? "/student"
+        : "/student/onboarding"
+    );
+  } else if (existingProfile.role === "recruiter") {
+    navigate(
+      existingProfile.onboarding_completed
+        ? "/recruiter"
+        : "/recruiter/onboarding"
+    );
+  } else if (existingProfile.role === "college") {
+    navigate(
+      existingProfile.onboarding_completed
+        ? "/college"
+        : "/college/onboarding"
+    );
+  }
+
+  return;
+}
+
+// No profile exists → this is genuinely a new user
+const { error: profileError } = await supabase
+  .from("profiles")
+  .insert({
+    id: user.id,
+    full_name:
+      user.user_metadata?.full_name || "SkillBridge User",
+    email: user.email,
+    role: role,
+    onboarding_completed: false,
+  });
+
+if (profileError) {
+  setLoading(false);
+  setError(profileError.message);
+  return;
+}
+   
     // Send user to the correct portal
     if (role === "student") {
-      navigate("/student");
+      navigate("/student/onboarding");
     } else if (role === "recruiter") {
-      navigate("/recruiter");
+      navigate("/recruiter/onboarding");
     } else if (role === "college") {
-      navigate("/college");
+      navigate("/college/onboarding");
     }
 
     setLoading(false);
