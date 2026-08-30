@@ -69,14 +69,18 @@ function RecruiterLayout() {
             Dashboard
           </NavLink>
 
-          <div className="recruiter-nav-item disabled" title="Coming soon">
+          <NavLink
+            to="/recruiter/opportunities"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 7h16v12H4z" />
               <path d="M8 7V5h8v2M8 12h8" />
             </svg>
             Opportunities
-            <span className="recruiter-coming-soon">soon</span>
-          </div>
+          </NavLink>
 
           <div className="recruiter-nav-item disabled" title="Coming soon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -117,10 +121,7 @@ function RecruiterLayout() {
       <div className="recruiter-main-area">
         <header className="recruiter-topbar">
           <span className="recruiter-topbar-kicker">// recruiter portal</span>
-
-          <span className="recruiter-topbar-note">
-            Hiring workspace
-          </span>
+          <span className="recruiter-topbar-note">Hiring workspace</span>
         </header>
 
         <main className="recruiter-content">
