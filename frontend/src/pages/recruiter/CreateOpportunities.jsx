@@ -235,6 +235,10 @@ function CreateOpportunity() {
       application_deadline: applicationDeadline
         ? new Date(`${applicationDeadline}T23:59:59`).toISOString()
         : null,
+
+      // New opportunities begin as drafts.
+      // Recruiters publish them from the opportunities page.
+      status: "draft",
     };
 
     const { data: opportunity, error: opportunityError } = await supabase

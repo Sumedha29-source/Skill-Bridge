@@ -527,3 +527,88 @@
     width: 100%;
   }
 }
+
+
+/* ---------- publish / close controls ---------- */
+
+.recruiter-opportunity-tags .status-draft {
+  background: rgba(255, 161, 22, 0.10);
+  color: var(--recruiter-shell-brand);
+}
+
+.recruiter-opportunity-tags .status-open {
+  background: rgba(0, 184, 163, 0.10);
+  color: var(--recruiter-shell-success);
+}
+
+.recruiter-opportunity-tags .status-closed {
+  background: var(--recruiter-shell-panel-soft);
+  color: var(--recruiter-shell-muted);
+}
+
+.recruiter-opportunity-status-actions {
+  margin-top: 18px;
+  padding-top: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  border-top: 1px solid var(--recruiter-shell-border);
+}
+
+.recruiter-opportunity-status-actions > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recruiter-opportunity-status-actions strong {
+  font-size: 0.84rem;
+}
+
+.recruiter-opportunity-status-actions span {
+  color: var(--recruiter-shell-muted);
+  font-size: 0.74rem;
+}
+
+.recruiter-opportunity-status-actions button {
+  flex: none;
+  min-height: 38px;
+  padding: 0 14px;
+
+  border-radius: 9px;
+  cursor: pointer;
+
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.recruiter-opportunity-status-actions button.publish {
+  border: 0;
+  background: var(--recruiter-shell-accent);
+  color: #ffffff;
+}
+
+.recruiter-opportunity-status-actions button.close {
+  border: 1px solid var(--recruiter-shell-border);
+  background: var(--recruiter-shell-panel-soft);
+  color: var(--recruiter-shell-ink);
+}
+
+.recruiter-opportunity-status-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+  .recruiter-opportunity-status-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recruiter-opportunity-status-actions button {
+    width: 100%;
+  }
+}
