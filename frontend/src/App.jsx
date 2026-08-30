@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RecruiterOnboarding from "./pages/recruiter/Onboarding";
 import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
+import StudentProfile from "./pages/student/Profile";
 
 import Landing from "./pages/public/Landing";
 import Signup from "./pages/public/Signup";
@@ -41,7 +42,16 @@ function App() {
           }
         >
           <Route index element={<StudentDashboard />} />
-          <Route path="onboarding" element={<StudentOnboarding />} />
+
+          <Route
+            path="onboarding"
+            element={<StudentOnboarding />}
+          />
+
+          <Route
+            path="profile"
+            element={<StudentProfile />}
+          />
         </Route>
 
         {/* Recruiter portal */}
@@ -54,7 +64,11 @@ function App() {
           }
         >
           <Route index element={<RecruiterDashboard />} />
-          <Route path="onboarding" element={<RecruiterOnboarding />} />
+
+          <Route
+            path="onboarding"
+            element={<RecruiterOnboarding />}
+          />
         </Route>
 
         {/* College portal */}
@@ -67,8 +81,16 @@ function App() {
           }
         >
           <Route index element={<CollegeDashboard />} />
-          <Route path="onboarding" element={<CollegeOnboarding />} />
-          <Route path="departments" element={<DepartmentSetup />} />
+
+          <Route
+            path="onboarding"
+            element={<CollegeOnboarding />}
+          />
+
+          <Route
+            path="departments"
+            element={<DepartmentSetup />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
