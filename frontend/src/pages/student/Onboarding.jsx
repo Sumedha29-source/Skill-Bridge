@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { supabase } from "../../services/supabase";
 import { useAuth } from "../../hooks/useAuth";
+import "./StudentOnboarding.css";
 
 function StudentOnboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // --------------------------------------------------
-  // College and department data from Supabase
+  // Supabase data
   // --------------------------------------------------
 
   const [institutions, setInstitutions] = useState([]);
@@ -19,35 +20,39 @@ function StudentOnboarding() {
   // Student form fields
   // --------------------------------------------------
 
-  const [phone, setPhone] = useState("");
+  const [state, setState] = useState("");
   const [institutionId, setInstitutionId] = useState("");
   const [departmentId, setDepartmentId] = useState("");
+
+  const [studentId, setStudentId] = useState("");
+  const [collegeEmail, setCollegeEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   const [degree, setDegree] = useState("");
   const [currentYear, setCurrentYear] = useState("");
   const [currentSemester, setCurrentSemester] = useState("");
   const [graduationYear, setGraduationYear] = useState("");
-
   const [cgpa, setCgpa] = useState("");
-  const [collegeEmail, setCollegeEmail] = useState("");
 
   // --------------------------------------------------
-  // Loading / errors
+  // Page states
   // --------------------------------------------------
 
+  const [stage, setStage] = useState("form");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
 
   // --------------------------------------------------
-  // Load institutions when page opens
+  // Load institutions
   // --------------------------------------------------
 
   useEffect(() => {
     async function loadInstitutions() {
       const { data, error: institutionError } = await supabase
         .from("institutions")
-        .select("id, name")
+        .select("id, name, state")
+        .eq("type", "college")
         .order("name");
 
       if (institutionError) {
@@ -64,12 +69,33 @@ function StudentOnboarding() {
   }, []);
 
   // --------------------------------------------------
-  // Load departments whenever college changes
+  // Available states from real institutions
+  // --------------------------------------------------
+
+  const availableStates = useMemo(() => {
+    return [
+      ...new Set(
+        institutions
+          .map((institution) => institution.state)
+          .filter(Boolean)
+      ),
+    ].sort((a, b) => a.localeCompare(b));
+  }, [institutions]);
+
+  const filteredInstitutions = useMemo(() => {
+    if (!state) return [];
+
+    return institutions.filter(
+      (institution) => institution.state === state
+    );
+  }, [institutions, state]);
+
+  // --------------------------------------------------
+  // Load departments when college changes
   // --------------------------------------------------
 
   useEffect(() => {
     async function loadDepartments() {
-      // No college selected yet
       if (!institutionId) {
         setDepartments([]);
         setDepartmentId("");
@@ -88,8 +114,6 @@ function StudentOnboarding() {
       }
 
       setDepartments(data || []);
-
-      // Clear old department selection
       setDepartmentId("");
     }
 
@@ -97,7 +121,26 @@ function StudentOnboarding() {
   }, [institutionId]);
 
   // --------------------------------------------------
-  // Submit student onboarding
+  // Helpers
+  // --------------------------------------------------
+
+  const selectedInstitution = institutions.find(
+    (institution) => institution.id === institutionId
+  );
+
+  const selectedDepartment = departments.find(
+    (department) => department.id === departmentId
+  );
+
+  function handleStateChange(event) {
+    setState(event.target.value);
+    setInstitutionId("");
+    setDepartmentId("");
+    setDepartments([]);
+  }
+
+  // --------------------------------------------------
+  // Submit onboarding
   // --------------------------------------------------
 
   async function handleSubmit(event) {
@@ -107,6 +150,11 @@ function StudentOnboarding() {
 
     if (!user) {
       setError("You must be logged in.");
+      return;
+    }
+
+    if (!state) {
+      setError("Please select your state.");
       return;
     }
 
@@ -120,10 +168,56 @@ function StudentOnboarding() {
       return;
     }
 
+    if (!studentId.trim()) {
+      setError("Please enter your roll number / student ID.");
+      return;
+    }
+
+    if (!/^[6-9][0-9]{9}$/.test(phone)) {
+      setError("Enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+
+    if (cgpa && (Number(cgpa) < 0 || Number(cgpa) > 10)) {
+      setError("CGPA must be between 0 and 10.");
+      return;
+    }
+
     setLoading(true);
+    setStage("checking");
+
+    const normalizedStudentId = studentId.trim().toUpperCase();
 
     // --------------------------------------------------
-    // 1. Create/update student profile
+    // 1. Check if student ID is already used
+    //    inside this institution
+    // --------------------------------------------------
+
+    const { data: duplicateStudent, error: duplicateError } = await supabase
+      .from("student_profiles")
+      .select("user_id")
+      .eq("institution_id", institutionId)
+      .ilike("student_id", normalizedStudentId)
+      .maybeSingle();
+
+    if (duplicateError) {
+      setLoading(false);
+      setStage("form");
+      setError(duplicateError.message);
+      return;
+    }
+
+    if (duplicateStudent && duplicateStudent.user_id !== user.id) {
+      setLoading(false);
+      setStage("form");
+      setError(
+        "That student ID is already registered under this institution."
+      );
+      return;
+    }
+
+    // --------------------------------------------------
+    // 2. Create/update student profile
     // --------------------------------------------------
 
     const { error: studentError } = await supabase
@@ -132,24 +226,25 @@ function StudentOnboarding() {
         {
           user_id: user.id,
 
-          phone: phone,
+          phone: `+91${phone}`,
 
           institution_id: institutionId,
           department_id: departmentId,
 
-          degree: degree,
+          student_id: normalizedStudentId,
+          college_email: collegeEmail.trim().toLowerCase(),
+
+          degree: degree.trim(),
 
           current_year: Number(currentYear),
           current_semester: Number(currentSemester),
-
           graduation_year: Number(graduationYear),
 
           cgpa: cgpa ? Number(cgpa) : null,
 
-          college_email: collegeEmail || null,
+          verification_status: "pending",
+          verified_at: null,
 
-          // Basic profile completion value for now.
-          // We will calculate this dynamically later.
           profile_completion: 60,
         },
         {
@@ -159,12 +254,13 @@ function StudentOnboarding() {
 
     if (studentError) {
       setLoading(false);
+      setStage("form");
       setError(studentError.message);
       return;
     }
 
     // --------------------------------------------------
-    // 2. Mark onboarding as completed
+    // 3. Mark onboarding completed
     // --------------------------------------------------
 
     const { error: profileError } = await supabase
@@ -176,293 +272,522 @@ function StudentOnboarding() {
 
     if (profileError) {
       setLoading(false);
+      setStage("form");
       setError(profileError.message);
       return;
     }
 
     setLoading(false);
-
-    // --------------------------------------------------
-    // 3. Send student to dashboard
-    // --------------------------------------------------
-
-    navigate("/student");
+    setStage("success");
   }
 
   // --------------------------------------------------
-  // Loading institutions
+  // Loading
   // --------------------------------------------------
 
   if (pageLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="student-onboarding-loading">
+        Loading SkillBridge…
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Complete Your Student Profile</h1>
+    <>
+      <div className="top-accent"></div>
+      <div className="glow"></div>
+      <div className="glow-2"></div>
+      <div className="grain"></div>
 
-      <p>
-        Tell us about your academic background so SkillBridge can
-        personalize opportunities for you.
-      </p>
+      <div className="student-onboarding-page">
+        {/* =========================
+            NAVBAR
+        ========================== */}
 
-      <form onSubmit={handleSubmit}>
-        {/* ------------------------------------------
-            NAME
-        ------------------------------------------ */}
-
-        <div>
-          <label>Full Name</label>
-          <br />
-
-          <input
-            type="text"
-            value={user?.user_metadata?.full_name || ""}
-            readOnly
-          />
-        </div>
-
-        <br />
-
-        {/* ------------------------------------------
-            LOGIN EMAIL
-        ------------------------------------------ */}
-
-        <div>
-          <label>Email</label>
-          <br />
-
-          <input
-            type="email"
-            value={user?.email || ""}
-            readOnly
-          />
-        </div>
-
-        <br />
-
-        {/* ------------------------------------------
-            PHONE
-        ------------------------------------------ */}
-
-        <div>
-          <label>Phone Number</label>
-          <br />
-
-          <input
-            type="tel"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            placeholder="Enter your phone number"
-            required
-          />
-        </div>
-
-        <br />
-
-        {/* ------------------------------------------
-            COLLEGE
-        ------------------------------------------ */}
-
-        <div>
-          <label>College / Institution</label>
-          <br />
-
-          <select
-            value={institutionId}
-            onChange={(event) => setInstitutionId(event.target.value)}
-            required
+        <nav className="student-onboarding-nav">
+          <button
+            type="button"
+            className="student-logo"
+            onClick={() => navigate("/")}
+            aria-label="Go to SkillBridge home"
           >
-            <option value="">Select your college</option>
-
-            {institutions.map((institution) => (
-              <option
-                key={institution.id}
-                value={institution.id}
+            <span className="mark">
+              <svg
+                viewBox="0 0 26 22"
+                width="17"
+                height="14"
+                fill="none"
+                stroke="#1a1a1a"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {institution.name}
-              </option>
-            ))}
-          </select>
-        </div>
+                <path d="M2 15 L2 9 M24 15 L24 9" />
+                <path d="M2 9 C 9 -1 17 -1 24 9" />
+                <line x1="0" y1="15" x2="26" y2="15" />
+                <line x1="7" y1="10" x2="7" y2="15" />
+                <line x1="13" y1="7.5" x2="13" y2="15" />
+                <line x1="19" y1="10" x2="19" y2="15" />
+              </svg>
+            </span>
 
-        <br />
+            <span>
+              Skill<span className="accent">Bridge</span>
+            </span>
+          </button>
 
-        {/* ------------------------------------------
-            DEPARTMENT
-        ------------------------------------------ */}
-
-        <div>
-          <label>Department</label>
-          <br />
-
-          <select
-            value={departmentId}
-            onChange={(event) => setDepartmentId(event.target.value)}
-            disabled={!institutionId}
-            required
+          <button
+            type="button"
+            className="student-back-link"
+            onClick={() => navigate("/")}
           >
-            <option value="">Select your department</option>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M11 6l-6 6 6 6" />
+            </svg>
 
-            {departments.map((department) => (
-              <option
-                key={department.id}
-                value={department.id}
-              >
-                {department.name} ({department.code})
-              </option>
-            ))}
-          </select>
-        </div>
+            Back to home
+          </button>
+        </nav>
 
-        <br />
+        {/* =========================
+            CONTENT
+        ========================== */}
 
-        {/* ------------------------------------------
-            DEGREE
-        ------------------------------------------ */}
+        <main className="student-verify-wrap">
+          <div className="student-verify-head">
+            <div className="eyebrow">// student onboarding</div>
 
-        <div>
-          <label>Degree</label>
-          <br />
+            <h1>
+              <span className="student-accent-text">Complete</span> your
+              student profile
+            </h1>
 
-          <input
-            type="text"
-            value={degree}
-            onChange={(event) => setDegree(event.target.value)}
-            placeholder="Example: B.Tech"
-            required
-          />
-        </div>
+            <p>
+              Add your college and academic details so SkillBridge can build
+              your profile and match you with relevant opportunities.
+            </p>
+          </div>
 
-        <br />
+          <div className="student-verify-card">
+            {/* =========================
+                FORM
+            ========================== */}
 
-        {/* ------------------------------------------
-            CURRENT YEAR
-        ------------------------------------------ */}
+            {stage === "form" && (
+              <div className="student-verify-panel active">
+                <form
+                  className="student-verify-form"
+                  onSubmit={handleSubmit}
+                >
+                  <label>
+                    <span className="student-field-label">Full name</span>
 
-        <div>
-          <label>Current Year</label>
-          <br />
+                    <input
+                      type="text"
+                      value={user?.user_metadata?.full_name || ""}
+                      readOnly
+                    />
+                  </label>
 
-          <select
-            value={currentYear}
-            onChange={(event) => setCurrentYear(event.target.value)}
-            required
-          >
-            <option value="">Select year</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-            <option value="4">4th Year</option>
-            <option value="5">5th Year</option>
-          </select>
-        </div>
+                  <label>
+                    <span className="student-field-label">
+                      Login email
+                    </span>
 
-        <br />
+                    <input
+                      type="email"
+                      value={user?.email || ""}
+                      readOnly
+                    />
+                  </label>
 
-        {/* ------------------------------------------
-            CURRENT SEMESTER
-        ------------------------------------------ */}
+                  <div className="student-field-row">
+                    <label className="student-field">
+                      <span className="student-field-label">State</span>
 
-        <div>
-          <label>Current Semester</label>
-          <br />
+                      <select
+                        value={state}
+                        onChange={handleStateChange}
+                        required
+                      >
+                        <option value="" disabled>
+                          Select your state
+                        </option>
 
-          <select
-            value={currentSemester}
-            onChange={(event) => setCurrentSemester(event.target.value)}
-            required
-          >
-            <option value="">Select semester</option>
+                        {availableStates.map((stateName) => (
+                          <option key={stateName} value={stateName}>
+                            {stateName}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
 
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((semester) => (
-              <option
-                key={semester}
-                value={semester}
-              >
-                Semester {semester}
-              </option>
-            ))}
-          </select>
-        </div>
+                    <label className="student-field">
+                      <span className="student-field-label">College</span>
 
-        <br />
+                      <select
+                        value={institutionId}
+                        onChange={(event) =>
+                          setInstitutionId(event.target.value)
+                        }
+                        disabled={!state}
+                        required
+                      >
+                        <option value="" disabled>
+                          {state
+                            ? "Select your college"
+                            : "Select a state first"}
+                        </option>
 
-        {/* ------------------------------------------
-            GRADUATION YEAR
-        ------------------------------------------ */}
+                        {filteredInstitutions.map((institution) => (
+                          <option
+                            key={institution.id}
+                            value={institution.id}
+                          >
+                            {institution.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
 
-        <div>
-          <label>Graduation Year</label>
-          <br />
+                  {state && filteredInstitutions.length === 0 && (
+                    <p className="student-field-notice">
+                      No SkillBridge colleges are registered for this state
+                      yet.
+                    </p>
+                  )}
 
-          <input
-            type="number"
-            value={graduationYear}
-            onChange={(event) =>
-              setGraduationYear(event.target.value)
-            }
-            placeholder="Example: 2029"
-            min="2026"
-            max="2040"
-            required
-          />
-        </div>
+                  <label>
+                    <span className="student-field-label">Department</span>
 
-        <br />
+                    <select
+                      value={departmentId}
+                      onChange={(event) =>
+                        setDepartmentId(event.target.value)
+                      }
+                      disabled={!institutionId}
+                      required
+                    >
+                      <option value="" disabled>
+                        {institutionId
+                          ? "Select your department"
+                          : "Select a college first"}
+                      </option>
 
-        {/* ------------------------------------------
-            CGPA
-        ------------------------------------------ */}
+                      {departments.map((department) => (
+                        <option
+                          key={department.id}
+                          value={department.id}
+                        >
+                          {department.name} ({department.code})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-        <div>
-          <label>CGPA</label>
-          <br />
+                  <label>
+                    <span className="student-field-label">
+                      Roll number / Student ID
+                    </span>
 
-          <input
-            type="number"
-            value={cgpa}
-            onChange={(event) => setCgpa(event.target.value)}
-            placeholder="Example: 8.25"
-            min="0"
-            max="10"
-            step="0.01"
-          />
-        </div>
+                    <input
+                      type="text"
+                      value={studentId}
+                      onChange={(event) =>
+                        setStudentId(event.target.value.toUpperCase())
+                      }
+                      placeholder="e.g. HITK23CSE104"
+                      autoComplete="off"
+                      required
+                    />
 
-        <br />
+                    <span className="student-field-hint">
+                      Use the ID issued by your college.
+                    </span>
+                  </label>
 
-        {/* ------------------------------------------
-            COLLEGE EMAIL
-        ------------------------------------------ */}
+                  <label>
+                    <span className="student-field-label">
+                      College email
+                    </span>
 
-        <div>
-          <label>College Email (Optional)</label>
-          <br />
+                    <input
+                      type="email"
+                      value={collegeEmail}
+                      onChange={(event) =>
+                        setCollegeEmail(event.target.value)
+                      }
+                      placeholder="you@college.edu"
+                      required
+                    />
 
-          <input
-            type="email"
-            value={collegeEmail}
-            onChange={(event) =>
-              setCollegeEmail(event.target.value)
-            }
-            placeholder="student@college.edu"
-          />
-        </div>
+                    <span className="student-field-hint">
+                      Prefer your official institutional/student email.
+                    </span>
+                  </label>
 
-        <br />
+                  <label>
+                    <span className="student-field-label">
+                      Phone number
+                    </span>
 
-        {/* ------------------------------------------
-            SUBMIT
-        ------------------------------------------ */}
+                    <div className="student-phone-field">
+                      <span className="student-phone-code">+91</span>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Saving profile..." : "Complete Profile"}
-        </button>
-      </form>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(event) => {
+                          const digits = event.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10);
 
-      {error && <p>{error}</p>}
-    </div>
+                          setPhone(digits);
+                        }}
+                        inputMode="numeric"
+                        placeholder="9876543210"
+                        required
+                      />
+                    </div>
+                  </label>
+
+                  <div className="student-field-row">
+                    <label className="student-field">
+                      <span className="student-field-label">Degree</span>
+
+                      <input
+                        type="text"
+                        value={degree}
+                        onChange={(event) => setDegree(event.target.value)}
+                        placeholder="e.g. B.Tech"
+                        required
+                      />
+                    </label>
+
+                    <label className="student-field">
+                      <span className="student-field-label">
+                        Current year
+                      </span>
+
+                      <select
+                        value={currentYear}
+                        onChange={(event) =>
+                          setCurrentYear(event.target.value)
+                        }
+                        required
+                      >
+                        <option value="" disabled>
+                          Select year
+                        </option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                        <option value="5">5th Year</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="student-field-row">
+                    <label className="student-field">
+                      <span className="student-field-label">
+                        Current semester
+                      </span>
+
+                      <select
+                        value={currentSemester}
+                        onChange={(event) =>
+                          setCurrentSemester(event.target.value)
+                        }
+                        required
+                      >
+                        <option value="" disabled>
+                          Select semester
+                        </option>
+
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                          (semester) => (
+                            <option
+                              key={semester}
+                              value={semester}
+                            >
+                              Semester {semester}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </label>
+
+                    <label className="student-field">
+                      <span className="student-field-label">
+                        Graduation year
+                      </span>
+
+                      <input
+                        type="number"
+                        value={graduationYear}
+                        onChange={(event) =>
+                          setGraduationYear(event.target.value)
+                        }
+                        min="2026"
+                        max="2040"
+                        placeholder="2029"
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <label>
+                    <span className="student-field-label">
+                      CGPA
+                      <span className="student-optional-field">
+                        {" "}
+                        optional
+                      </span>
+                    </span>
+
+                    <input
+                      type="number"
+                      value={cgpa}
+                      onChange={(event) => setCgpa(event.target.value)}
+                      min="0"
+                      max="10"
+                      step="0.01"
+                      placeholder="e.g. 8.25"
+                    />
+                  </label>
+
+                  {error && (
+                    <p className="student-verify-error">{error}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="student-btn student-btn-primary student-verify-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "Saving..." : "Complete Profile"}
+
+                    {!loading && (
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                      >
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    )}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* =========================
+                CHECKING
+            ========================== */}
+
+            {stage === "checking" && (
+              <div className="student-verify-panel active student-checking-panel">
+                <div className="student-verify-spinner"></div>
+
+                <p className="student-verify-status-text">
+                  Saving your SkillBridge profile for{" "}
+                  <strong>
+                    {selectedInstitution?.name || "your college"}
+                  </strong>
+                  …
+                </p>
+              </div>
+            )}
+
+            {/* =========================
+                SUCCESS
+            ========================== */}
+
+            {stage === "success" && (
+              <div className="student-verify-panel active student-success-panel">
+                <div className="student-result-icon good">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+
+                <h3>Student profile completed</h3>
+
+                <p className="student-result-sub">
+                  Your profile has been saved. Your student verification status
+                  is currently <strong>pending</strong> until your institution
+                  verification flow is connected.
+                </p>
+
+                <div className="student-detail-rows">
+                  <div className="student-detail-row">
+                    <span>Name</span>
+                    <strong>
+                      {user?.user_metadata?.full_name || "Student"}
+                    </strong>
+                  </div>
+
+                  <div className="student-detail-row">
+                    <span>College</span>
+                    <strong>{selectedInstitution?.name || "—"}</strong>
+                  </div>
+
+                  <div className="student-detail-row">
+                    <span>Department</span>
+                    <strong>{selectedDepartment?.name || "—"}</strong>
+                  </div>
+
+                  <div className="student-detail-row">
+                    <span>Student ID</span>
+                    <strong>{studentId.trim().toUpperCase()}</strong>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="student-btn student-btn-primary student-continue-button"
+                  onClick={() => navigate("/student")}
+                >
+                  Continue to SkillBridge
+                </button>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* =========================
+            FOOTER
+        ========================== */}
+
+        <footer className="student-onboarding-footer">
+          <span>© 2026 SkillBridge</span>
+
+          <span>
+            Your academic profile powers opportunity matching and skill-gap
+            insights.
+          </span>
+        </footer>
+      </div>
+    </>
   );
 }
 
