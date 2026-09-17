@@ -17,65 +17,73 @@ function RecruiterOpportunities() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    loadOpportunities();
-  }, [user]);
-
-  async function loadOpportunities() {
     if (!user) return;
 
-    setLoading(true);
-    setError("");
+    let cancelled = false;
 
-    const { data: recruiter, error: recruiterError } = await supabase
-      .from("recruiter_profiles")
-      .select("id, company_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    async function loadOpportunities() {
+      const { data: recruiter, error: recruiterError } = await supabase
+        .from("recruiter_profiles")
+        .select("id, company_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-    if (recruiterError) {
-      setError(recruiterError.message);
+      if (cancelled) return;
+
+      if (recruiterError) {
+        setError(recruiterError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!recruiter?.company_id) {
+        setError("No company is linked to this recruiter account.");
+        setLoading(false);
+        return;
+      }
+
+      const [companyResult, opportunityResult] = await Promise.all([
+        supabase
+          .from("companies")
+          .select("id, name")
+          .eq("id", recruiter.company_id)
+          .maybeSingle(),
+
+        supabase
+          .from("opportunities")
+          .select(
+            "id, title, type, description, location, work_mode, duration, stipend_min, stipend_max, salary_min, salary_max, minimum_cgpa, graduation_year, status, application_deadline, eligible_department_codes, created_at"
+          )
+          .eq("company_id", recruiter.company_id)
+          .order("created_at", { ascending: false }),
+      ]);
+
+      if (cancelled) return;
+
+      if (companyResult.error) {
+        setError(companyResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (opportunityResult.error) {
+        setError(opportunityResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      setCompany(companyResult.data || null);
+      setOpportunities(opportunityResult.data || []);
+      setError("");
       setLoading(false);
-      return;
     }
 
-    if (!recruiter?.company_id) {
-      setError("No company is linked to this recruiter account.");
-      setLoading(false);
-      return;
-    }
+    loadOpportunities();
 
-    const [companyResult, opportunityResult] = await Promise.all([
-      supabase
-        .from("companies")
-        .select("id, name")
-        .eq("id", recruiter.company_id)
-        .maybeSingle(),
-
-      supabase
-        .from("opportunities")
-        .select(
-          "id, title, type, description, location, work_mode, duration, stipend_min, stipend_max, salary_min, salary_max, minimum_cgpa, graduation_year, status, application_deadline, eligible_department_codes, created_at"
-        )
-        .eq("company_id", recruiter.company_id)
-        .order("created_at", { ascending: false }),
-    ]);
-
-    if (companyResult.error) {
-      setError(companyResult.error.message);
-      setLoading(false);
-      return;
-    }
-
-    if (opportunityResult.error) {
-      setError(opportunityResult.error.message);
-      setLoading(false);
-      return;
-    }
-
-    setCompany(companyResult.data || null);
-    setOpportunities(opportunityResult.data || []);
-    setLoading(false);
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   async function changeStatus(opportunity, nextStatus) {
     setError("");

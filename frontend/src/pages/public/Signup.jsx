@@ -86,6 +86,7 @@ function Signup() {
       email: email.trim().toLowerCase(),
       password,
       options: {
+        emailRedirectTo: "http://localhost:5173/login",
         data: {
           full_name: fullName,
           selected_role: selectedRole,

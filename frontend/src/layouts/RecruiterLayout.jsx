@@ -53,6 +53,7 @@ function RecruiterLayout() {
         </div>
 
         <nav className="recruiter-sidebar-nav">
+          {/* DASHBOARD */}
           <NavLink
             to="/recruiter"
             end
@@ -60,45 +61,84 @@ function RecruiterLayout() {
               `recruiter-nav-item ${isActive ? "active" : ""}`
             }
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="3" y="3" width="7" height="7" rx="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" />
               <rect x="3" y="14" width="7" height="7" rx="1" />
               <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
+
             Dashboard
           </NavLink>
 
+          {/* OPPORTUNITIES */}
           <NavLink
             to="/recruiter/opportunities"
             className={({ isActive }) =>
               `recruiter-nav-item ${isActive ? "active" : ""}`
             }
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 7h16v12H4z" />
               <path d="M8 7V5h8v2M8 12h8" />
             </svg>
+
             Opportunities
           </NavLink>
 
-          <div className="recruiter-nav-item disabled" title="Coming soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {/* CANDIDATES */}
+          <NavLink
+            to="/recruiter/candidates"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="9" cy="8" r="3" />
               <circle cx="17" cy="10" r="2" />
-              <path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6M15 15c3 0 5 1.7 6 5" />
-            </svg>
-            Candidates
-            <span className="recruiter-coming-soon">soon</span>
-          </div>
 
-          <div className="recruiter-nav-item disabled" title="Coming soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6" />
+              <path d="M15 15c3 0 5 1.7 6 5" />
+            </svg>
+
+            Candidates
+          </NavLink>
+
+          {/* SHORTLIST - NOT BUILT YET */}
+          <div
+            className="recruiter-nav-item disabled"
+            title="Coming soon"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M5 4h14v16H5z" />
               <path d="M8 8h8M8 12h5M8 16h6" />
             </svg>
+
             Shortlist
-            <span className="recruiter-coming-soon">soon</span>
+
+            <span className="recruiter-coming-soon">
+              soon
+            </span>
           </div>
         </nav>
 
@@ -120,8 +160,13 @@ function RecruiterLayout() {
 
       <div className="recruiter-main-area">
         <header className="recruiter-topbar">
-          <span className="recruiter-topbar-kicker">// recruiter portal</span>
-          <span className="recruiter-topbar-note">Hiring workspace</span>
+          <span className="recruiter-topbar-kicker">
+            // recruiter portal
+          </span>
+
+          <span className="recruiter-topbar-note">
+            Hiring workspace
+          </span>
         </header>
 
         <main className="recruiter-content">

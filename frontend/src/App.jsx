@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RecruiterOnboarding from "./pages/recruiter/Onboarding";
 import RecruiterOpportunities from "./pages/recruiter/Opportunities";
 import CreateOpportunity from "./pages/recruiter/CreateOpportunities";
+import RecruiterCandidates from "./pages/recruiter/Candidates";
 
 import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
+
 import StudentProfile from "./pages/student/Profile";
 import StudentOpportunities from "./pages/student/StudentOpportunities";
 
@@ -48,7 +50,10 @@ function App() {
           <Route index element={<StudentDashboard />} />
           <Route path="onboarding" element={<StudentOnboarding />} />
           <Route path="profile" element={<StudentProfile />} />
-          <Route path="opportunities" element={<StudentOpportunities />} />
+          <Route
+            path="opportunities"
+            element={<StudentOpportunities />}
+          />
         </Route>
 
         {/* Recruiter portal */}
@@ -61,11 +66,25 @@ function App() {
           }
         >
           <Route index element={<RecruiterDashboard />} />
-          <Route path="onboarding" element={<RecruiterOnboarding />} />
-          <Route path="opportunities" element={<RecruiterOpportunities />} />
+
+          <Route
+            path="onboarding"
+            element={<RecruiterOnboarding />}
+          />
+
+          <Route
+            path="opportunities"
+            element={<RecruiterOpportunities />}
+          />
+
           <Route
             path="opportunities/create"
             element={<CreateOpportunity />}
+          />
+
+          <Route
+            path="candidates"
+            element={<RecruiterCandidates />}
           />
         </Route>
 
