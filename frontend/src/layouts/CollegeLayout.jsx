@@ -142,9 +142,11 @@ function CollegeLayout() {
 
           {/* TRAINING */}
 
-          <div
-            className="college-nav-item disabled"
-            title="Coming soon"
+          <NavLink
+            to="/college/training"
+            className={({ isActive }) =>
+              `college-nav-item ${isActive ? "active" : ""}`
+            }
           >
             <svg
               viewBox="0 0 24 24"
@@ -157,11 +159,7 @@ function CollegeLayout() {
             </svg>
 
             Training
-
-            <span className="college-coming-soon">
-              soon
-            </span>
-          </div>
+          </NavLink>
         </nav>
 
         <div className="college-sidebar-bottom">

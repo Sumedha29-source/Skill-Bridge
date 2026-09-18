@@ -23,6 +23,7 @@ import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
 import Students from "./pages/college/Students";
 import SkillGapMap from "./pages/college/SkillGapMap";
+import Training from "./pages/college/Training";
 
 /* =========================
    STUDENT PAGES
@@ -226,6 +227,11 @@ function App() {
           <Route
             path="skill-gap"
             element={<SkillGapMap />}
+          />
+
+          <Route
+            path="training"
+            element={<Training />}
           />
         </Route>
       </Routes>
