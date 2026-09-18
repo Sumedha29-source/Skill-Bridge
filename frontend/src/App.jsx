@@ -21,6 +21,7 @@ import Shortlist from "./pages/recruiter/Shortlist";
 
 import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
+import Students from "./pages/college/Students";
 
 /* =========================
    STUDENT PAGES
@@ -214,6 +215,11 @@ function App() {
           <Route
             path="departments"
             element={<DepartmentSetup />}
+          />
+
+          <Route
+            path="students"
+            element={<Students />}
           />
         </Route>
       </Routes>

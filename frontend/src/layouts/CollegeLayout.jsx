@@ -60,7 +60,12 @@ function CollegeLayout() {
               `college-nav-item ${isActive ? "active" : ""}`
             }
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="3" y="3" width="7" height="7" rx="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" />
               <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -75,33 +80,63 @@ function CollegeLayout() {
               `college-nav-item ${isActive ? "active" : ""}`
             }
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 20V8l8-4 8 4v12" />
               <path d="M8 20v-6h8v6M9 10h.01M15 10h.01" />
             </svg>
             Departments
           </NavLink>
 
-          <div className="college-nav-item disabled" title="Coming soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <NavLink
+            to="/college/students"
+            className={({ isActive }) =>
+              `college-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="9" cy="8" r="3" />
               <circle cx="17" cy="10" r="2" />
               <path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6M15 15c3 0 5 1.7 6 5" />
             </svg>
             Students
-            <span className="college-coming-soon">soon</span>
-          </div>
+          </NavLink>
 
-          <div className="college-nav-item disabled" title="Coming soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            className="college-nav-item disabled"
+            title="Coming soon"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />
             </svg>
             Skill gap map
             <span className="college-coming-soon">soon</span>
           </div>
 
-          <div className="college-nav-item disabled" title="Coming soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            className="college-nav-item disabled"
+            title="Coming soon"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 5h16v14H4z" />
               <path d="M8 9h8M8 13h5" />
             </svg>
@@ -128,7 +163,9 @@ function CollegeLayout() {
 
       <div className="college-main-area">
         <header className="college-topbar">
-          <span className="college-topbar-kicker">// college portal</span>
+          <span className="college-topbar-kicker">
+            // college portal
+          </span>
 
           <button
             type="button"
