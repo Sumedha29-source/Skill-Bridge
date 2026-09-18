@@ -235,13 +235,28 @@
 }
 
 .recruiter-candidate-footer button {
-  padding: 11px 18px;
-  border: 1px solid #d5d8dc;
+  padding: 11px 20px;
+  border: 1px solid #ed365b;
   border-radius: 9px;
-  background: #f0f1f2;
-  color: #999;
+  background: #ed365b;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 600;
-  cursor: not-allowed;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.recruiter-candidate-footer button:hover {
+  background: #d92d50;
+  border-color: #d92d50;
+  transform: translateY(-1px);
+}
+
+.recruiter-candidate-footer button:active {
+  transform: translateY(0);
 }
 
 .recruiter-candidates-empty {

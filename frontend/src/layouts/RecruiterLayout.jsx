@@ -16,6 +16,7 @@ function RecruiterLayout() {
   return (
     <div className="recruiter-shell">
       <aside className="recruiter-sidebar">
+        {/* LOGO */}
         <button
           type="button"
           className="recruiter-sidebar-logo"
@@ -47,11 +48,13 @@ function RecruiterLayout() {
           </span>
         </button>
 
+        {/* WORKSPACE LABEL */}
         <div className="recruiter-sidebar-role">
           <span className="recruiter-role-dot"></span>
           Recruiter workspace
         </div>
 
+        {/* NAVIGATION */}
         <nav className="recruiter-sidebar-nav">
           {/* DASHBOARD */}
           <NavLink
@@ -119,10 +122,12 @@ function RecruiterLayout() {
             Candidates
           </NavLink>
 
-          {/* SHORTLIST - NOT BUILT YET */}
-          <div
-            className="recruiter-nav-item disabled"
-            title="Coming soon"
+          {/* SHORTLIST */}
+          <NavLink
+            to="/recruiter/shortlist"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
           >
             <svg
               viewBox="0 0 24 24"
@@ -135,13 +140,10 @@ function RecruiterLayout() {
             </svg>
 
             Shortlist
-
-            <span className="recruiter-coming-soon">
-              soon
-            </span>
-          </div>
+          </NavLink>
         </nav>
 
+        {/* USER / LOGOUT */}
         <div className="recruiter-sidebar-bottom">
           <div className="recruiter-user-card">
             <div className="recruiter-avatar">
@@ -158,6 +160,7 @@ function RecruiterLayout() {
         </div>
       </aside>
 
+      {/* MAIN CONTENT */}
       <div className="recruiter-main-area">
         <header className="recruiter-topbar">
           <span className="recruiter-topbar-kicker">

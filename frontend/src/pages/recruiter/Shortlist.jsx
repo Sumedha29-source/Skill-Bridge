@@ -5,7 +5,7 @@ import { supabase } from "../../services/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import "./RecruiterCandidates.css";
 
-function RecruiterCandidates() {
+function Shortlist() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ function RecruiterCandidates() {
 
     let cancelled = false;
 
-    async function loadCandidates() {
+    async function loadShortlist() {
       try {
         setLoading(true);
         setError("");
@@ -65,7 +65,7 @@ function RecruiterCandidates() {
         }
 
         // --------------------------------------------------
-        // 3. GET THIS COMPANY'S OPPORTUNITIES
+        // 3. GET COMPANY OPPORTUNITIES
         // --------------------------------------------------
 
         const {
@@ -91,7 +91,6 @@ function RecruiterCandidates() {
         setCompany(companyData || null);
         setOpportunities(companyOpportunities);
 
-        // No opportunities means there cannot be applicants yet.
         if (opportunityIds.length === 0) {
           setApplications([]);
           setStudentProfiles([]);
@@ -101,7 +100,7 @@ function RecruiterCandidates() {
         }
 
         // --------------------------------------------------
-        // 4. GET APPLICATIONS
+        // 4. GET ONLY SHORTLISTED APPLICATIONS
         // --------------------------------------------------
 
         const {
@@ -113,7 +112,8 @@ function RecruiterCandidates() {
             "id, student_id, opportunity_id, status, match_score_at_apply, applied_at, updated_at"
           )
           .in("opportunity_id", opportunityIds)
-          .order("applied_at", { ascending: false });
+          .eq("status", "shortlisted")
+          .order("updated_at", { ascending: false });
 
         if (applicationError) {
           throw applicationError;
@@ -165,7 +165,7 @@ function RecruiterCandidates() {
         setStudentProfiles(studentRows);
 
         // --------------------------------------------------
-        // 6. GET ACCOUNT PROFILE FOR NAME + EMAIL
+        // 6. GET ACCOUNT PROFILES
         // --------------------------------------------------
 
         const userIds = [
@@ -197,12 +197,12 @@ function RecruiterCandidates() {
         setProfiles(profileData || []);
         setLoading(false);
       } catch (loadError) {
-        console.error("Candidate loading error:", loadError);
+        console.error("Shortlist loading error:", loadError);
 
         if (!cancelled) {
           setError(
             loadError?.message ||
-              "Unable to load recruiter candidates."
+              "Unable to load shortlisted candidates."
           );
 
           setLoading(false);
@@ -210,7 +210,7 @@ function RecruiterCandidates() {
       }
     }
 
-    loadCandidates();
+    loadShortlist();
 
     return () => {
       cancelled = true;
@@ -266,7 +266,7 @@ function RecruiterCandidates() {
   if (loading) {
     return (
       <div className="recruiter-candidates-state">
-        Loading candidates…
+        Loading shortlist…
       </div>
     );
   }
@@ -279,20 +279,21 @@ function RecruiterCandidates() {
     <div className="recruiter-candidates-page">
       <section className="recruiter-candidates-head">
         <span className="recruiter-candidates-kicker">
-          // candidate matching
+          // hiring shortlist
         </span>
 
-        <h1>Your candidates</h1>
+        <h1>Shortlisted candidates</h1>
 
         <p>
-          Review students who applied to opportunities posted by{" "}
+          Review candidates selected for the next stage of
+          opportunities posted by{" "}
           {company?.name || "your company"}.
         </p>
       </section>
 
       {error && (
         <div className="recruiter-candidates-error">
-          <strong>Could not load candidates</strong>
+          <strong>Could not load shortlist</strong>
           <span>{error}</span>
         </div>
       )}
@@ -301,28 +302,25 @@ function RecruiterCandidates() {
         <>
           <section className="recruiter-candidates-summary">
             <article>
-              <span>Total applicants</span>
+              <span>Shortlisted</span>
               <strong>{applications.length}</strong>
-            </article>
-
-            <article>
-              <span>Applied</span>
-
-              <strong>
-                {
-                  applications.filter(
-                    (application) =>
-                      String(
-                        application.status || ""
-                      ).toLowerCase() === "applied"
-                  ).length
-                }
-              </strong>
             </article>
 
             <article>
               <span>Opportunities</span>
               <strong>{opportunities.length}</strong>
+            </article>
+
+            <article>
+              <span>Company</span>
+              <strong
+                style={{
+                  fontSize: "20px",
+                  textAlign: "center",
+                }}
+              >
+                {company?.name || "—"}
+              </strong>
             </article>
           </section>
 
@@ -335,20 +333,16 @@ function RecruiterCandidates() {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <circle cx="9" cy="8" r="3" />
-                  <circle cx="17" cy="10" r="2" />
-
-                  <path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6" />
-                  <path d="M15 15c3 0 5 1.7 6 5" />
+                  <path d="M5 4h14v16H5z" />
+                  <path d="M8 8h8M8 12h5M8 16h6" />
                 </svg>
               </div>
 
-              <h2>No candidates yet</h2>
+              <h2>No shortlisted candidates yet</h2>
 
               <p>
-                Applications from eligible students will appear
-                here after they apply to one of your
-                opportunities.
+                Candidates you shortlist from the candidate
+                review page will appear here.
               </p>
             </section>
           ) : (
@@ -382,10 +376,6 @@ function RecruiterCandidates() {
                   )
                 );
 
-                const applicationStatus = String(
-                  application.status || "applied"
-                ).toLowerCase();
-
                 return (
                   <article
                     key={application.id}
@@ -402,17 +392,15 @@ function RecruiterCandidates() {
                         <div className="recruiter-candidate-name-row">
                           <h2>{candidateName}</h2>
 
-                          <span
-                            className={`recruiter-candidate-status status-${applicationStatus}`}
-                          >
-                            {applicationStatus}
+                          <span className="recruiter-candidate-status status-shortlisted">
+                            shortlisted
                           </span>
                         </div>
 
                         <p>{candidateEmail}</p>
 
                         <span className="recruiter-candidate-role">
-                          Applied for{" "}
+                          Shortlisted for{" "}
                           <strong>
                             {opportunity?.title ||
                               "Opportunity"}
@@ -479,6 +467,13 @@ function RecruiterCandidates() {
                           )}
                         </span>
 
+                        <span>
+                          Shortlisted{" "}
+                          {formatDate(
+                            application.updated_at
+                          )}
+                        </span>
+
                         {student?.verification_status && (
                           <span className="recruiter-candidate-verification">
                             Student verification:{" "}
@@ -509,4 +504,4 @@ function RecruiterCandidates() {
   );
 }
 
-export default RecruiterCandidates;
+export default Shortlist;
