@@ -13,6 +13,7 @@ import DepartmentSetup from "./pages/college/DepartmentSetup";
 import StudentProfile from "./pages/student/Profile";
 import StudentOpportunities from "./pages/student/StudentOpportunities";
 import Assessment from "./pages/student/Assessment";
+import TakeAssessment from "./pages/student/TakeAssessment";
 
 import Landing from "./pages/public/Landing";
 import Signup from "./pages/public/Signup";
@@ -38,14 +39,19 @@ function App() {
         {/* =========================
             PUBLIC PAGES
         ========================= */}
+
         <Route path="/" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/select-role" element={<RoleSelection />} />
+        <Route
+          path="/select-role"
+          element={<RoleSelection />}
+        />
 
         {/* =========================
             STUDENT PORTAL
         ========================= */}
+
         <Route
           path="/student"
           element={
@@ -54,7 +60,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<StudentDashboard />} />
+          <Route
+            index
+            element={<StudentDashboard />}
+          />
 
           <Route
             path="onboarding"
@@ -72,6 +81,11 @@ function App() {
           />
 
           <Route
+            path="assessment/:skillId"
+            element={<TakeAssessment />}
+          />
+
+          <Route
             path="opportunities"
             element={<StudentOpportunities />}
           />
@@ -80,6 +94,7 @@ function App() {
         {/* =========================
             RECRUITER PORTAL
         ========================= */}
+
         <Route
           path="/recruiter"
           element={
@@ -88,7 +103,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<RecruiterDashboard />} />
+          <Route
+            index
+            element={<RecruiterDashboard />}
+          />
 
           <Route
             path="onboarding"
@@ -124,6 +142,7 @@ function App() {
         {/* =========================
             COLLEGE PORTAL
         ========================= */}
+
         <Route
           path="/college"
           element={
@@ -132,7 +151,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<CollegeDashboard />} />
+          <Route
+            index
+            element={<CollegeDashboard />}
+          />
 
           <Route
             path="onboarding"

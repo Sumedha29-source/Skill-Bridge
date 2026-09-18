@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { supabase } from "../../services/supabase";
 import "./Assessment.css";
 
 function Assessment() {
+  const navigate = useNavigate();
+
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,20 +20,21 @@ function Assessment() {
       setLoading(true);
       setError("");
 
-      const { data: questions, error: questionError } = await supabase
-        .from("assessment_questions")
-        .select(`
-          id,
-          difficulty,
-          question_type,
-          skill_id,
-          skills (
+      const { data: questions, error: questionError } =
+        await supabase
+          .from("assessment_questions")
+          .select(`
             id,
-            name,
-            category
-          )
-        `)
-        .eq("question_type", "technical");
+            difficulty,
+            question_type,
+            skill_id,
+            skills (
+              id,
+              name,
+              category
+            )
+          `)
+          .eq("question_type", "technical");
 
       if (questionError) {
         throw questionError;
@@ -98,6 +102,7 @@ function Assessment() {
   return (
     <div className="assessment-page">
       {/* PAGE HEADER */}
+
       <section className="assessment-header">
         <div>
           <span className="assessment-kicker">
@@ -114,6 +119,7 @@ function Assessment() {
       </section>
 
       {/* HOW IT WORKS */}
+
       <section className="assessment-info-grid">
         <div className="assessment-info-card">
           <span>01</span>
@@ -148,6 +154,7 @@ function Assessment() {
       </section>
 
       {/* AVAILABLE ASSESSMENTS */}
+
       <section className="assessment-list-section">
         <div className="assessment-section-heading">
           <div>
@@ -164,6 +171,7 @@ function Assessment() {
         </div>
 
         {/* ERROR */}
+
         {error && (
           <div className="assessment-error">
             <p>{error}</p>
@@ -178,6 +186,7 @@ function Assessment() {
         )}
 
         {/* EMPTY */}
+
         {!error && assessments.length === 0 && (
           <div className="assessment-empty">
             <h3>No assessments available yet</h3>
@@ -190,6 +199,7 @@ function Assessment() {
         )}
 
         {/* ASSESSMENT CARDS */}
+
         {!error && assessments.length > 0 && (
           <div className="assessment-grid">
             {assessments.map((assessment) => (
@@ -219,6 +229,7 @@ function Assessment() {
                     <strong>
                       {assessment.beginnerCount}
                     </strong>
+
                     <span>Beginner</span>
                   </div>
 
@@ -226,6 +237,7 @@ function Assessment() {
                     <strong>
                       {assessment.intermediateCount}
                     </strong>
+
                     <span>Intermediate</span>
                   </div>
 
@@ -233,6 +245,7 @@ function Assessment() {
                     <strong>
                       {assessment.advancedCount}
                     </strong>
+
                     <span>Advanced</span>
                   </div>
                 </div>
@@ -240,12 +253,11 @@ function Assessment() {
                 <button
                   type="button"
                   className="assessment-start-button"
-                  onClick={() => {
-                    console.log(
-                      "Start assessment:",
-                      assessment.id
-                    );
-                  }}
+                  onClick={() =>
+                    navigate(
+                      `/student/assessment/${assessment.id}`
+                    )
+                  }
                 >
                   Start assessment
                   <span>→</span>
