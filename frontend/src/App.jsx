@@ -1,4 +1,12 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+/* =========================
+   RECRUITER PAGES
+========================= */
 
 import RecruiterOnboarding from "./pages/recruiter/Onboarding";
 import RecruiterOpportunities from "./pages/recruiter/Opportunities";
@@ -7,18 +15,35 @@ import RecruiterCandidates from "./pages/recruiter/Candidates";
 import CandidateDetails from "./pages/recruiter/CandidateDetails";
 import Shortlist from "./pages/recruiter/Shortlist";
 
+/* =========================
+   COLLEGE PAGES
+========================= */
+
 import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
+
+/* =========================
+   STUDENT PAGES
+========================= */
 
 import StudentProfile from "./pages/student/Profile";
 import StudentOpportunities from "./pages/student/StudentOpportunities";
 import Assessment from "./pages/student/Assessment";
 import TakeAssessment from "./pages/student/TakeAssessment";
+import SkillRoadmap from "./pages/student/SkillRoadmap";
+
+/* =========================
+   PUBLIC PAGES
+========================= */
 
 import Landing from "./pages/public/Landing";
 import Signup from "./pages/public/Signup";
 import Login from "./pages/public/Login";
 import RoleSelection from "./pages/public/RoleSelection";
+
+/* =========================
+   DASHBOARDS / ONBOARDING
+========================= */
 
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentOnboarding from "./pages/student/Onboarding";
@@ -26,9 +51,17 @@ import StudentOnboarding from "./pages/student/Onboarding";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import CollegeDashboard from "./pages/college/Dashboard";
 
+/* =========================
+   LAYOUTS
+========================= */
+
 import StudentLayout from "./layouts/StudentLayout";
 import RecruiterLayout from "./layouts/RecruiterLayout";
 import CollegeLayout from "./layouts/CollegeLayout";
+
+/* =========================
+   AUTH
+========================= */
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -40,9 +73,21 @@ function App() {
             PUBLIC PAGES
         ========================= */}
 
-        <Route path="/" element={<Landing />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={<Landing />}
+        />
+
+        <Route
+          path="/signup"
+          element={<Signup />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
         <Route
           path="/select-role"
           element={<RoleSelection />}
@@ -88,6 +133,11 @@ function App() {
           <Route
             path="opportunities"
             element={<StudentOpportunities />}
+          />
+
+          <Route
+            path="roadmap"
+            element={<SkillRoadmap />}
           />
         </Route>
 

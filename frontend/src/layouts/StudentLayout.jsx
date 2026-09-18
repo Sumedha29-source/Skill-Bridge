@@ -16,6 +16,10 @@ function StudentLayout() {
   return (
     <div className="student-shell">
       <aside className="student-sidebar">
+        {/* =========================
+            LOGO
+        ========================= */}
+
         <button
           type="button"
           className="student-sidebar-logo"
@@ -47,18 +51,29 @@ function StudentLayout() {
           </span>
         </button>
 
+        {/* =========================
+            WORKSPACE LABEL
+        ========================= */}
+
         <div className="student-sidebar-role">
           <span className="student-role-dot"></span>
           Student workspace
         </div>
 
+        {/* =========================
+            NAVIGATION
+        ========================= */}
+
         <nav className="student-sidebar-nav">
           {/* DASHBOARD */}
+
           <NavLink
             to="/student"
             end
             className={({ isActive }) =>
-              `student-nav-item ${isActive ? "active" : ""}`
+              `student-nav-item ${
+                isActive ? "active" : ""
+              }`
             }
           >
             <svg
@@ -67,19 +82,50 @@ function StudentLayout() {
               stroke="currentColor"
               strokeWidth="2"
             >
-              <rect x="3" y="3" width="7" height="7" rx="1" />
-              <rect x="14" y="3" width="7" height="7" rx="1" />
-              <rect x="3" y="14" width="7" height="7" rx="1" />
-              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect
+                x="3"
+                y="3"
+                width="7"
+                height="7"
+                rx="1"
+              />
+
+              <rect
+                x="14"
+                y="3"
+                width="7"
+                height="7"
+                rx="1"
+              />
+
+              <rect
+                x="3"
+                y="14"
+                width="7"
+                height="7"
+                rx="1"
+              />
+
+              <rect
+                x="14"
+                y="14"
+                width="7"
+                height="7"
+                rx="1"
+              />
             </svg>
+
             Dashboard
           </NavLink>
 
           {/* PROFILE */}
+
           <NavLink
             to="/student/profile"
             className={({ isActive }) =>
-              `student-nav-item ${isActive ? "active" : ""}`
+              `student-nav-item ${
+                isActive ? "active" : ""
+              }`
             }
           >
             <svg
@@ -89,16 +135,21 @@ function StudentLayout() {
               strokeWidth="2"
             >
               <circle cx="12" cy="8" r="4" />
+
               <path d="M4 21c.8-4.2 3.4-6 8-6s7.2 1.8 8 6" />
             </svg>
+
             Profile
           </NavLink>
 
           {/* SKILL ASSESSMENT */}
+
           <NavLink
             to="/student/assessment"
             className={({ isActive }) =>
-              `student-nav-item ${isActive ? "active" : ""}`
+              `student-nav-item ${
+                isActive ? "active" : ""
+              }`
             }
           >
             <svg
@@ -107,20 +158,30 @@ function StudentLayout() {
               stroke="currentColor"
               strokeWidth="2"
             >
-              <path d="M9 3h6" />
-              <path d="M9 5H6a2 2 0 0 0-2 2v13h16V7a2 2 0 0 0-2-2h-3" />
-              <rect x="8" y="2" width="8" height="4" rx="1" />
-              <path d="m8 13 2 2 5-5" />
-              <path d="M8 19h8" />
+              <rect
+                x="5"
+                y="5"
+                width="14"
+                height="16"
+                rx="2"
+              />
+
+              <path d="M9 5V3h6v2" />
+              <path d="m9 12 2 2 4-5" />
+              <path d="M9 17h6" />
             </svg>
+
             Skill Assessment
           </NavLink>
 
           {/* OPPORTUNITIES */}
+
           <NavLink
             to="/student/opportunities"
             className={({ isActive }) =>
-              `student-nav-item ${isActive ? "active" : ""}`
+              `student-nav-item ${
+                isActive ? "active" : ""
+              }`
             }
           >
             <svg
@@ -132,13 +193,19 @@ function StudentLayout() {
               <path d="M4 7h16v12H4z" />
               <path d="M8 7V5h8v2M9 12h6" />
             </svg>
+
             Opportunities
           </NavLink>
 
-          {/* SKILL ROADMAP - LATER */}
-          <div
-            className="student-nav-item disabled"
-            title="Coming soon"
+          {/* SKILL ROADMAP */}
+
+          <NavLink
+            to="/student/roadmap"
+            className={({ isActive }) =>
+              `student-nav-item ${
+                isActive ? "active" : ""
+              }`
+            }
           >
             <svg
               viewBox="0 0 24 24"
@@ -148,26 +215,41 @@ function StudentLayout() {
             >
               <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />
             </svg>
+
             Skill roadmap
-            <span className="student-coming-soon">soon</span>
-          </div>
+          </NavLink>
         </nav>
+
+        {/* =========================
+            USER / LOGOUT
+        ========================= */}
 
         <div className="student-sidebar-bottom">
           <div className="student-user-card">
             <div className="student-avatar">
-              {studentName.charAt(0).toUpperCase()}
+              {studentName
+                .charAt(0)
+                .toUpperCase()}
             </div>
 
             <div className="student-user-copy">
-              <strong>{studentName}</strong>
-              <span>{user?.email || ""}</span>
+              <strong>
+                {studentName}
+              </strong>
+
+              <span>
+                {user?.email || ""}
+              </span>
             </div>
           </div>
 
           <LogoutButton />
         </div>
       </aside>
+
+      {/* =========================
+          MAIN AREA
+      ========================= */}
 
       <div className="student-main-area">
         <header className="student-topbar">
@@ -180,7 +262,9 @@ function StudentLayout() {
           <button
             type="button"
             className="student-profile-shortcut"
-            onClick={() => navigate("/student/profile")}
+            onClick={() =>
+              navigate("/student/profile")
+            }
           >
             View profile
           </button>
