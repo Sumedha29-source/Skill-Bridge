@@ -53,6 +53,8 @@ function CollegeLayout() {
         </div>
 
         <nav className="college-sidebar-nav">
+          {/* DASHBOARD */}
+
           <NavLink
             to="/college"
             end
@@ -71,8 +73,11 @@ function CollegeLayout() {
               <rect x="3" y="14" width="7" height="7" rx="1" />
               <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
+
             Dashboard
           </NavLink>
+
+          {/* DEPARTMENTS */}
 
           <NavLink
             to="/college/departments"
@@ -89,8 +94,11 @@ function CollegeLayout() {
               <path d="M4 20V8l8-4 8 4v12" />
               <path d="M8 20v-6h8v6M9 10h.01M15 10h.01" />
             </svg>
+
             Departments
           </NavLink>
+
+          {/* STUDENTS */}
 
           <NavLink
             to="/college/students"
@@ -108,12 +116,17 @@ function CollegeLayout() {
               <circle cx="17" cy="10" r="2" />
               <path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6M15 15c3 0 5 1.7 6 5" />
             </svg>
+
             Students
           </NavLink>
 
-          <div
-            className="college-nav-item disabled"
-            title="Coming soon"
+          {/* SKILL GAP MAP */}
+
+          <NavLink
+            to="/college/skill-gap"
+            className={({ isActive }) =>
+              `college-nav-item ${isActive ? "active" : ""}`
+            }
           >
             <svg
               viewBox="0 0 24 24"
@@ -123,9 +136,11 @@ function CollegeLayout() {
             >
               <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />
             </svg>
+
             Skill gap map
-            <span className="college-coming-soon">soon</span>
-          </div>
+          </NavLink>
+
+          {/* TRAINING */}
 
           <div
             className="college-nav-item disabled"
@@ -140,8 +155,12 @@ function CollegeLayout() {
               <path d="M4 5h16v14H4z" />
               <path d="M8 9h8M8 13h5" />
             </svg>
+
             Training
-            <span className="college-coming-soon">soon</span>
+
+            <span className="college-coming-soon">
+              soon
+            </span>
           </div>
         </nav>
 
@@ -170,7 +189,9 @@ function CollegeLayout() {
           <button
             type="button"
             className="college-department-shortcut"
-            onClick={() => navigate("/college/departments")}
+            onClick={() =>
+              navigate("/college/departments")
+            }
           >
             Manage departments
           </button>

@@ -22,6 +22,7 @@ import Shortlist from "./pages/recruiter/Shortlist";
 import CollegeOnboarding from "./pages/college/Onboarding";
 import DepartmentSetup from "./pages/college/DepartmentSetup";
 import Students from "./pages/college/Students";
+import SkillGapMap from "./pages/college/SkillGapMap";
 
 /* =========================
    STUDENT PAGES
@@ -220,6 +221,11 @@ function App() {
           <Route
             path="students"
             element={<Students />}
+          />
+
+          <Route
+            path="skill-gap"
+            element={<SkillGapMap />}
           />
         </Route>
       </Routes>
