@@ -14,9 +14,8 @@ import CreateOpportunity from "./pages/recruiter/CreateOpportunities";
 import RecruiterCandidates from "./pages/recruiter/Candidates";
 import CandidateDetails from "./pages/recruiter/CandidateDetails";
 import Shortlist from "./pages/recruiter/Shortlist";
-
-import FacultyOpportunities from "./pages/recruiter/FacultyOpportunities";
 import CreateFacultyOpportunity from "./pages/recruiter/CreateFacultyOpportunity";
+import FacultyOpportunities from "./pages/recruiter/FacultyOpportunities";
 
 /* =========================
    COLLEGE PAGES
@@ -45,6 +44,7 @@ import SkillRoadmap from "./pages/student/SkillRoadmap";
 import FacultyOnboarding from "./pages/faculty/Onboarding";
 import FacultyDashboard from "./pages/faculty/Dashboard";
 import FacultyOpportunitiesPage from "./pages/faculty/Opportunities";
+import MyApplications from "./pages/faculty/MyApplications";
 
 /* =========================
    PUBLIC PAGES
@@ -88,10 +88,7 @@ function App() {
             PUBLIC PAGES
         ========================= */}
 
-        <Route
-          path="/"
-          element={<Landing />}
-        />
+        <Route path="/" element={<Landing />} />
 
         <Route
           path="/signup"
@@ -120,28 +117,20 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* STUDENT DASHBOARD */}
-
           <Route
             index
             element={<StudentDashboard />}
           />
-
-          {/* STUDENT ONBOARDING */}
 
           <Route
             path="onboarding"
             element={<StudentOnboarding />}
           />
 
-          {/* STUDENT PROFILE */}
-
           <Route
             path="profile"
             element={<StudentProfile />}
           />
-
-          {/* ASSESSMENTS */}
 
           <Route
             path="assessment"
@@ -153,14 +142,10 @@ function App() {
             element={<TakeAssessment />}
           />
 
-          {/* OPPORTUNITIES */}
-
           <Route
             path="opportunities"
             element={<StudentOpportunities />}
           />
-
-          {/* SKILL ROADMAP */}
 
           <Route
             path="roadmap"
@@ -180,21 +165,15 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* RECRUITER DASHBOARD */}
-
           <Route
             index
             element={<RecruiterDashboard />}
           />
 
-          {/* RECRUITER ONBOARDING */}
-
           <Route
             path="onboarding"
             element={<RecruiterOnboarding />}
           />
-
-          {/* STUDENT OPPORTUNITIES */}
 
           <Route
             path="opportunities"
@@ -218,8 +197,6 @@ function App() {
             element={<CreateFacultyOpportunity />}
           />
 
-          {/* CANDIDATES */}
-
           <Route
             path="candidates"
             element={<RecruiterCandidates />}
@@ -229,8 +206,6 @@ function App() {
             path="candidates/:applicationId"
             element={<CandidateDetails />}
           />
-
-          {/* SHORTLIST */}
 
           <Route
             path="shortlist"
@@ -250,42 +225,30 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* COLLEGE DASHBOARD */}
-
           <Route
             index
             element={<CollegeDashboard />}
           />
-
-          {/* COLLEGE ONBOARDING */}
 
           <Route
             path="onboarding"
             element={<CollegeOnboarding />}
           />
 
-          {/* DEPARTMENTS */}
-
           <Route
             path="departments"
             element={<DepartmentSetup />}
           />
-
-          {/* STUDENTS */}
 
           <Route
             path="students"
             element={<Students />}
           />
 
-          {/* SKILL GAP MAP */}
-
           <Route
             path="skill-gap"
             element={<SkillGapMap />}
           />
-
-          {/* TRAINING */}
 
           <Route
             path="training"
@@ -305,25 +268,32 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* FACULTY DASHBOARD */}
+          {/* DASHBOARD */}
 
           <Route
             index
             element={<FacultyDashboard />}
           />
 
-          {/* FACULTY ONBOARDING */}
+          {/* ONBOARDING */}
 
           <Route
             path="onboarding"
             element={<FacultyOnboarding />}
           />
 
-          {/* FACULTY OPPORTUNITIES */}
+          {/* OPPORTUNITIES */}
 
           <Route
             path="opportunities"
             element={<FacultyOpportunitiesPage />}
+          />
+
+          {/* APPLICATION TRACKING */}
+
+          <Route
+            path="applications"
+            element={<MyApplications />}
           />
         </Route>
       </Routes>
