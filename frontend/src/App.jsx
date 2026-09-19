@@ -15,6 +15,9 @@ import RecruiterCandidates from "./pages/recruiter/Candidates";
 import CandidateDetails from "./pages/recruiter/CandidateDetails";
 import Shortlist from "./pages/recruiter/Shortlist";
 
+import FacultyOpportunities from "./pages/recruiter/FacultyOpportunities";
+import CreateFacultyOpportunity from "./pages/recruiter/CreateFacultyOpportunity";
+
 /* =========================
    COLLEGE PAGES
 ========================= */
@@ -34,6 +37,13 @@ import StudentOpportunities from "./pages/student/StudentOpportunities";
 import Assessment from "./pages/student/Assessment";
 import TakeAssessment from "./pages/student/TakeAssessment";
 import SkillRoadmap from "./pages/student/SkillRoadmap";
+
+/* =========================
+   FACULTY PAGES
+========================= */
+
+import FacultyOnboarding from "./pages/faculty/Onboarding";
+import FacultyDashboard from "./pages/faculty/Dashboard";
 
 /* =========================
    PUBLIC PAGES
@@ -61,6 +71,7 @@ import CollegeDashboard from "./pages/college/Dashboard";
 import StudentLayout from "./layouts/StudentLayout";
 import RecruiterLayout from "./layouts/RecruiterLayout";
 import CollegeLayout from "./layouts/CollegeLayout";
+import FacultyLayout from "./layouts/FacultyLayout";
 
 /* =========================
    AUTH
@@ -156,15 +167,21 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* RECRUITER DASHBOARD */}
+
           <Route
             index
             element={<RecruiterDashboard />}
           />
 
+          {/* RECRUITER ONBOARDING */}
+
           <Route
             path="onboarding"
             element={<RecruiterOnboarding />}
           />
+
+          {/* STUDENT OPPORTUNITIES */}
 
           <Route
             path="opportunities"
@@ -176,6 +193,20 @@ function App() {
             element={<CreateOpportunity />}
           />
 
+          {/* FACULTY COLLABORATIONS */}
+
+          <Route
+            path="faculty-opportunities"
+            element={<FacultyOpportunities />}
+          />
+
+          <Route
+            path="faculty-opportunities/create"
+            element={<CreateFacultyOpportunity />}
+          />
+
+          {/* STUDENT CANDIDATES */}
+
           <Route
             path="candidates"
             element={<RecruiterCandidates />}
@@ -185,6 +216,8 @@ function App() {
             path="candidates/:applicationId"
             element={<CandidateDetails />}
           />
+
+          {/* SHORTLIST */}
 
           <Route
             path="shortlist"
@@ -204,34 +237,73 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* COLLEGE DASHBOARD */}
+
           <Route
             index
             element={<CollegeDashboard />}
           />
+
+          {/* COLLEGE ONBOARDING */}
 
           <Route
             path="onboarding"
             element={<CollegeOnboarding />}
           />
 
+          {/* DEPARTMENTS */}
+
           <Route
             path="departments"
             element={<DepartmentSetup />}
           />
+
+          {/* STUDENTS */}
 
           <Route
             path="students"
             element={<Students />}
           />
 
+          {/* SKILL GAP MAP */}
+
           <Route
             path="skill-gap"
             element={<SkillGapMap />}
           />
 
+          {/* TRAINING */}
+
           <Route
             path="training"
             element={<Training />}
+          />
+        </Route>
+
+        {/* =========================
+            FACULTY PORTAL
+        ========================= */}
+
+        <Route
+          path="/faculty"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <FacultyLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* FACULTY DASHBOARD */}
+
+          <Route
+            index
+            element={<FacultyDashboard />}
+          />
+
+          {/* FACULTY ONBOARDING */}
+
+          <Route
+            path="onboarding"
+            element={<FacultyOnboarding />}
           />
         </Route>
       </Routes>

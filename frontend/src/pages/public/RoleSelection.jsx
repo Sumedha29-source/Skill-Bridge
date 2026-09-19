@@ -9,11 +9,50 @@ function RoleSelection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /* =========================
+     REDIRECT BY ROLE
+  ========================= */
+
+  function redirectUser(role, onboardingCompleted) {
+    if (role === "student") {
+      navigate(
+        onboardingCompleted
+          ? "/student"
+          : "/student/onboarding"
+      );
+    } else if (role === "recruiter") {
+      navigate(
+        onboardingCompleted
+          ? "/recruiter"
+          : "/recruiter/onboarding"
+      );
+    } else if (role === "college") {
+      navigate(
+        onboardingCompleted
+          ? "/college"
+          : "/college/onboarding"
+      );
+    } else if (role === "faculty") {
+      navigate(
+        onboardingCompleted
+          ? "/faculty"
+          : "/faculty/onboarding"
+      );
+    }
+  }
+
+  /* =========================
+     SELECT ROLE
+  ========================= */
+
   async function selectRole(role) {
     setLoading(true);
     setError("");
 
-    // Get currently logged-in Supabase user
+    /* =========================
+       GET AUTH USER
+    ========================= */
+
     const {
       data: { user },
       error: userError,
@@ -21,12 +60,20 @@ function RoleSelection() {
 
     if (userError || !user) {
       setLoading(false);
-      setError("You must be logged in to choose a role.");
+      setError(
+        "You must be logged in to choose a role."
+      );
       return;
     }
 
-    // Check whether this user already has a SkillBridge profile
-    const { data: existingProfile, error: checkError } = await supabase
+    /* =========================
+       CHECK EXISTING PROFILE
+    ========================= */
+
+    const {
+      data: existingProfile,
+      error: checkError,
+    } = await supabase
       .from("profiles")
       .select("role, onboarding_completed")
       .eq("id", user.id)
@@ -38,44 +85,41 @@ function RoleSelection() {
       return;
     }
 
-    // If profile already exists, don't create another one
+    /* =========================
+       EXISTING USER
+    ========================= */
+
     if (existingProfile) {
       setLoading(false);
 
-      if (existingProfile.role === "student") {
-        navigate(
-          existingProfile.onboarding_completed
-            ? "/student"
-            : "/student/onboarding"
-        );
-      } else if (existingProfile.role === "recruiter") {
-        navigate(
-          existingProfile.onboarding_completed
-            ? "/recruiter"
-            : "/recruiter/onboarding"
-        );
-      } else if (existingProfile.role === "college") {
-        navigate(
-          existingProfile.onboarding_completed
-            ? "/college"
-            : "/college/onboarding"
-        );
-      }
+      redirectUser(
+        existingProfile.role,
+        existingProfile.onboarding_completed
+      );
 
       return;
     }
 
-    // No profile exists → create a new SkillBridge profile
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({
-        id: user.id,
-        full_name:
-          user.user_metadata?.full_name || "SkillBridge User",
-        email: user.email,
-        role: role,
-        onboarding_completed: false,
-      });
+    /* =========================
+       CREATE SKILLBRIDGE PROFILE
+    ========================= */
+
+    const { error: profileError } =
+      await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+
+          full_name:
+            user.user_metadata?.full_name ||
+            "SkillBridge User",
+
+          email: user.email,
+
+          role: role,
+
+          onboarding_completed: false,
+        });
 
     if (profileError) {
       setLoading(false);
@@ -83,14 +127,11 @@ function RoleSelection() {
       return;
     }
 
-    // Send user to the correct onboarding page
-    if (role === "student") {
-      navigate("/student/onboarding");
-    } else if (role === "recruiter") {
-      navigate("/recruiter/onboarding");
-    } else if (role === "college") {
-      navigate("/college/onboarding");
-    }
+    /* =========================
+       SEND TO ONBOARDING
+    ========================= */
+
+    redirectUser(role, false);
 
     setLoading(false);
   }
@@ -98,45 +139,71 @@ function RoleSelection() {
   return (
     <div className="role-page">
       <div className="role-container">
+        {/* =========================
+            BRAND
+        ========================= */}
 
-        {/* Brand */}
         <div className="role-brand">
-          <div className="role-logo">SB</div>
+          <div className="role-logo">
+            SB
+          </div>
+
           <span>SkillBridge</span>
         </div>
 
-        {/* Heading */}
+        {/* =========================
+            HEADING
+        ========================= */}
+
         <div className="role-heading">
-          <h1>How will you use SkillBridge?</h1>
+          <h1>
+            How will you use SkillBridge?
+          </h1>
 
           <p>
-            Choose your role so we can personalize your SkillBridge experience.
+            Choose your role so we can personalize your
+            SkillBridge experience.
           </p>
         </div>
 
-        {/* Role Cards */}
-        <div className="role-cards">
+        {/* =========================
+            ROLE CARDS
+        ========================= */}
 
-          {/* Student */}
+        <div className="role-cards">
+          {/* STUDENT */}
+
           <button
             type="button"
             className="role-card"
-            onClick={() => selectRole("student")}
+            onClick={() =>
+              selectRole("student")
+            }
             disabled={loading}
           >
-            <div className="role-icon">🎓</div>
+            <div className="role-icon">
+              🎓
+            </div>
 
             <h2>Student</h2>
 
             <p>
-              Build your skills, discover opportunities and prepare for your
-              career.
+              Build your skills, discover opportunities
+              and prepare for your career.
             </p>
 
             <ul>
-              <li>Build your skill profile</li>
-              <li>Discover matching opportunities</li>
-              <li>Identify missing skills</li>
+              <li>
+                Build your skill profile
+              </li>
+
+              <li>
+                Discover matching opportunities
+              </li>
+
+              <li>
+                Identify missing skills
+              </li>
             </ul>
 
             <span className="role-continue">
@@ -144,26 +211,41 @@ function RoleSelection() {
             </span>
           </button>
 
-          {/* Recruiter */}
+          {/* RECRUITER */}
+
           <button
             type="button"
             className="role-card"
-            onClick={() => selectRole("recruiter")}
+            onClick={() =>
+              selectRole("recruiter")
+            }
             disabled={loading}
           >
-            <div className="role-icon">💼</div>
+            <div className="role-icon">
+              💼
+            </div>
 
-            <h2>Recruiter / Industry</h2>
+            <h2>
+              Recruiter / Industry
+            </h2>
 
             <p>
-              Find skilled candidates and connect your opportunities with the
-              right talent.
+              Find skilled candidates and connect your
+              opportunities with the right talent.
             </p>
 
             <ul>
-              <li>Post jobs and internships</li>
-              <li>Find eligible candidates</li>
-              <li>Rank candidates by skills</li>
+              <li>
+                Post jobs and internships
+              </li>
+
+              <li>
+                Find eligible candidates
+              </li>
+
+              <li>
+                Rank candidates by skills
+              </li>
             </ul>
 
             <span className="role-continue">
@@ -171,26 +253,41 @@ function RoleSelection() {
             </span>
           </button>
 
-          {/* College */}
+          {/* COLLEGE */}
+
           <button
             type="button"
             className="role-card"
-            onClick={() => selectRole("college")}
+            onClick={() =>
+              selectRole("college")
+            }
             disabled={loading}
           >
-            <div className="role-icon">🏫</div>
+            <div className="role-icon">
+              🏫
+            </div>
 
-            <h2>College / Placement Cell</h2>
+            <h2>
+              College / Placement Cell
+            </h2>
 
             <p>
-              Understand student readiness and bridge the gap between academia
-              and industry.
+              Understand student readiness and bridge the
+              gap between academia and industry.
             </p>
 
             <ul>
-              <li>Monitor student readiness</li>
-              <li>Analyze industry skill demand</li>
-              <li>Discover institutional skill gaps</li>
+              <li>
+                Monitor student readiness
+              </li>
+
+              <li>
+                Analyze industry skill demand
+              </li>
+
+              <li>
+                Discover institutional skill gaps
+              </li>
             </ul>
 
             <span className="role-continue">
@@ -198,23 +295,73 @@ function RoleSelection() {
             </span>
           </button>
 
+          {/* FACULTY */}
+
+          <button
+            type="button"
+            className="role-card"
+            onClick={() =>
+              selectRole("faculty")
+            }
+            disabled={loading}
+          >
+            <div className="role-icon">
+              👩‍🏫
+            </div>
+
+            <h2>
+              Academician / Faculty
+            </h2>
+
+            <p>
+              Connect with industry for professional
+              development, research and academic
+              collaboration.
+            </p>
+
+            <ul>
+              <li>
+                Discover faculty development programs
+              </li>
+
+              <li>
+                Explore research and consultancy
+              </li>
+
+              <li>
+                Join industry collaborations
+              </li>
+            </ul>
+
+            <span className="role-continue">
+              Continue as Faculty →
+            </span>
+          </button>
         </div>
 
-        {/* Loading */}
+        {/* =========================
+            LOADING
+        ========================= */}
+
         {loading && (
           <div className="role-message">
             <div className="role-spinner"></div>
-            <p>Setting up your account...</p>
+
+            <p>
+              Setting up your account...
+            </p>
           </div>
         )}
 
-        {/* Error */}
+        {/* =========================
+            ERROR
+        ========================= */}
+
         {error && (
           <p className="role-error">
             {error}
           </p>
         )}
-
       </div>
     </div>
   );

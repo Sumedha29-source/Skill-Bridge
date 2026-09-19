@@ -73,8 +73,8 @@ function Login() {
     // ---------------------------------------------
     // 4. ROLE CHIP CHECK
     // ---------------------------------------------
-    // The role selector is real UI, but the database
-    // remains the source of truth for account role.
+    // The database remains the source of truth
+    // for the user's account role.
 
     if (profile.role !== selectedRole) {
       setLoading(false);
@@ -133,6 +133,22 @@ function Login() {
         navigate("/college");
       } else {
         navigate("/college/onboarding");
+      }
+
+      return;
+    }
+
+    // ---------------------------------------------
+    // 8. FACULTY
+    // ---------------------------------------------
+
+    if (profile.role === "faculty") {
+      setLoading(false);
+
+      if (profile.onboarding_completed) {
+        navigate("/faculty");
+      } else {
+        navigate("/faculty/onboarding");
       }
 
       return;
@@ -283,6 +299,8 @@ function Login() {
             Access your dashboard, matches and opportunities.
           </p>
 
+          {/* ROLE SELECTION */}
+
           <div className="login-role-row">
             <button
               type="button"
@@ -315,6 +333,17 @@ function Login() {
             >
               <span className="dot"></span>
               Recruiter
+            </button>
+
+            <button
+              type="button"
+              className={`login-role-chip faculty ${
+                selectedRole === "faculty" ? "active" : ""
+              }`}
+              onClick={() => setSelectedRole("faculty")}
+            >
+              <span className="dot"></span>
+              Faculty
             </button>
           </div>
 
@@ -460,7 +489,9 @@ function Login() {
             </div>
 
             {error && <div className="login-alert error">{error}</div>}
-            {message && <div className="login-alert success">{message}</div>}
+            {message && (
+              <div className="login-alert success">{message}</div>
+            )}
 
             <button
               type="submit"

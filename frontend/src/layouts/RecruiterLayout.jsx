@@ -79,7 +79,7 @@ function RecruiterLayout() {
             Dashboard
           </NavLink>
 
-          {/* OPPORTUNITIES */}
+          {/* STUDENT OPPORTUNITIES */}
           <NavLink
             to="/recruiter/opportunities"
             className={({ isActive }) =>
@@ -97,6 +97,29 @@ function RecruiterLayout() {
             </svg>
 
             Opportunities
+          </NavLink>
+
+          {/* FACULTY COLLABORATIONS */}
+          <NavLink
+            to="/recruiter/faculty-opportunities"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 10l9-5 9 5-9 5-9-5z" />
+              <path d="M7 12.5V17c3 2 7 2 10 0v-4.5" />
+              <path d="M21 10v6" />
+            </svg>
+
+            Faculty collaborations
           </NavLink>
 
           {/* CANDIDATES */}

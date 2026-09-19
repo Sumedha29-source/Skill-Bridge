@@ -12,6 +12,7 @@
   --login-student: #00b8a3;
   --login-college: #8b5cf6;
   --login-recruiter: #ff375f;
+  --login-faculty: #38bdf8;
 
   --login-nav-bg: rgba(26, 26, 26, 0.85);
 
@@ -53,6 +54,7 @@
     --login-student: #039083;
     --login-college: #7c3aed;
     --login-recruiter: #e42f55;
+    --login-faculty: #0284c7;
 
     --login-nav-bg: rgba(248, 246, 242, 0.85);
 
@@ -76,6 +78,7 @@
   --login-student: #039083;
   --login-college: #7c3aed;
   --login-recruiter: #e42f55;
+  --login-faculty: #0284c7;
 
   --login-nav-bg: rgba(248, 246, 242, 0.85);
 
@@ -93,11 +96,13 @@
   --login-muted: #97979c;
 
   --login-brand: #ffa116;
+
   --login-student: #00b8a3;
   --login-college: #8b5cf6;
   --login-recruiter: #ff375f;
+  --login-faculty: #38bdf8;
 
-  --login-nav-bg: rgba(26, 26, 26, 0.85);
+  --login-nav-bg: rgba(26,26,26,0.85);
 }
 
 .login-page *,
@@ -114,6 +119,10 @@
 .login-page svg {
   display: block;
 }
+
+/* =========================
+   BACKGROUND
+========================= */
 
 .login-glow {
   position: fixed;
@@ -185,6 +194,10 @@
 
   opacity: 0.8;
 }
+
+/* =========================
+   NAVIGATION
+========================= */
 
 .login-nav {
   position: sticky;
@@ -335,6 +348,10 @@
   }
 }
 
+/* =========================
+   MAIN
+========================= */
+
 .login-main {
   min-height: calc(100vh - 61px);
 
@@ -352,7 +369,7 @@
   overflow: hidden;
 
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
 
   padding:
     clamp(28px, 4vw, 40px)
@@ -422,22 +439,27 @@
   line-height: 1.5;
 }
 
+/* =========================
+   ROLE SELECTOR
+========================= */
+
 .login-role-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 
   margin-bottom: 22px;
 }
 
 .login-role-chip {
-  flex: 1;
+  width: 100%;
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
 
-  padding: 8px 6px;
+  padding: 9px 6px;
 
   border: 1px solid var(--login-border);
   border-radius: 9px;
@@ -453,6 +475,12 @@
 
   text-transform: uppercase;
   letter-spacing: 0.04em;
+
+  transition:
+    border-color .2s var(--login-ease),
+    color .2s var(--login-ease),
+    background .2s var(--login-ease),
+    transform .15s var(--login-ease-pop);
 }
 
 .login-role-chip .dot {
@@ -476,9 +504,15 @@
   background: var(--login-recruiter);
 }
 
+.login-role-chip.faculty .dot {
+  background: var(--login-faculty);
+}
+
 .login-role-chip:hover {
   border-color: var(--login-brand);
   color: var(--login-ink);
+
+  transform: translateY(-1px);
 }
 
 .login-role-chip.active.student {
@@ -498,6 +532,16 @@
   background: rgba(255,55,95,0.08);
   color: var(--login-recruiter);
 }
+
+.login-role-chip.active.faculty {
+  border-color: var(--login-faculty);
+  background: rgba(56,189,248,0.08);
+  color: var(--login-faculty);
+}
+
+/* =========================
+   SOCIAL LOGIN
+========================= */
 
 .login-social-row {
   display: grid;
@@ -537,6 +581,10 @@
   opacity: 0.65;
 }
 
+/* =========================
+   DIVIDER
+========================= */
+
 .login-divider {
   display: flex;
   align-items: center;
@@ -562,6 +610,10 @@
   font-family: var(--login-font-mono);
   font-size: 0.75rem;
 }
+
+/* =========================
+   FORM
+========================= */
 
 .login-form-group {
   margin-bottom: 18px;
@@ -605,6 +657,10 @@
   outline: none;
 
   font-size: 0.92rem;
+
+  transition:
+    border-color .2s var(--login-ease),
+    box-shadow .2s var(--login-ease);
 }
 
 .login-form-group input::placeholder {
@@ -617,6 +673,10 @@
   box-shadow:
     0 0 0 3px rgba(255,161,22,0.12);
 }
+
+/* =========================
+   PASSWORD
+========================= */
 
 .login-password-wrap {
   position: relative;
@@ -651,6 +711,10 @@
   height: 15px;
 }
 
+/* =========================
+   FORGOT PASSWORD
+========================= */
+
 .login-forgot-row {
   display: flex;
   justify-content: flex-end;
@@ -680,6 +744,10 @@
   cursor: default;
 }
 
+/* =========================
+   ALERTS
+========================= */
+
 .login-alert {
   margin-bottom: 14px;
   padding: 10px 12px;
@@ -701,6 +769,10 @@
   background: rgba(0,184,163,0.08);
   color: var(--login-student);
 }
+
+/* =========================
+   SUBMIT
+========================= */
 
 .login-submit {
   width: 100%;
@@ -759,6 +831,10 @@
   height: 16px;
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 .login-footer {
   margin: 20px 0 0;
 
@@ -780,13 +856,17 @@
   opacity: 0.8;
 }
 
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 480px) {
   .login-back-link {
     display: none;
   }
 
   .login-role-row {
-    flex-direction: column;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .login-social-row {
@@ -796,5 +876,9 @@
   .login-main {
     align-items: flex-start;
     padding-top: 28px;
+  }
+
+  .login-card {
+    max-width: 100%;
   }
 }

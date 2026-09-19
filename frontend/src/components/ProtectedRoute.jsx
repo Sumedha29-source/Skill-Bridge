@@ -19,9 +19,12 @@ function ProtectedRoute({ children, allowedRole }) {
 
       // No logged-in user
       if (!user) {
+        setRole(null);
         setRoleLoading(false);
         return;
       }
+
+      setRoleLoading(true);
 
       // Read this user's role from SkillBridge profiles
       const { data, error } = await supabase
@@ -31,7 +34,12 @@ function ProtectedRoute({ children, allowedRole }) {
         .maybeSingle();
 
       if (error) {
-        console.error("Error loading user role:", error.message);
+        console.error(
+          "Error loading user role:",
+          error.message
+        );
+
+        setRole(null);
         setRoleLoading(false);
         return;
       }
@@ -50,27 +58,68 @@ function ProtectedRoute({ children, allowedRole }) {
 
   // Not logged in
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
   }
 
   // Logged in but hasn't selected a role yet
   if (!role) {
-    return <Navigate to="/select-role" replace />;
+    return (
+      <Navigate
+        to="/select-role"
+        replace
+      />
+    );
   }
 
   // User is trying to access the wrong portal
   if (allowedRole && role !== allowedRole) {
     if (role === "student") {
-      return <Navigate to="/student" replace />;
+      return (
+        <Navigate
+          to="/student"
+          replace
+        />
+      );
     }
 
     if (role === "recruiter") {
-      return <Navigate to="/recruiter" replace />;
+      return (
+        <Navigate
+          to="/recruiter"
+          replace
+        />
+      );
     }
 
     if (role === "college") {
-      return <Navigate to="/college" replace />;
+      return (
+        <Navigate
+          to="/college"
+          replace
+        />
+      );
     }
+
+    if (role === "faculty") {
+      return (
+        <Navigate
+          to="/faculty"
+          replace
+        />
+      );
+    }
+
+    return (
+      <Navigate
+        to="/select-role"
+        replace
+      />
+    );
   }
 
   return children;
