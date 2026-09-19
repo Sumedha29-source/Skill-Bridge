@@ -44,6 +44,7 @@ import SkillRoadmap from "./pages/student/SkillRoadmap";
 
 import FacultyOnboarding from "./pages/faculty/Onboarding";
 import FacultyDashboard from "./pages/faculty/Dashboard";
+import FacultyOpportunitiesPage from "./pages/faculty/Opportunities";
 
 /* =========================
    PUBLIC PAGES
@@ -119,20 +120,28 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* STUDENT DASHBOARD */}
+
           <Route
             index
             element={<StudentDashboard />}
           />
+
+          {/* STUDENT ONBOARDING */}
 
           <Route
             path="onboarding"
             element={<StudentOnboarding />}
           />
 
+          {/* STUDENT PROFILE */}
+
           <Route
             path="profile"
             element={<StudentProfile />}
           />
+
+          {/* ASSESSMENTS */}
 
           <Route
             path="assessment"
@@ -144,10 +153,14 @@ function App() {
             element={<TakeAssessment />}
           />
 
+          {/* OPPORTUNITIES */}
+
           <Route
             path="opportunities"
             element={<StudentOpportunities />}
           />
+
+          {/* SKILL ROADMAP */}
 
           <Route
             path="roadmap"
@@ -205,7 +218,7 @@ function App() {
             element={<CreateFacultyOpportunity />}
           />
 
-          {/* STUDENT CANDIDATES */}
+          {/* CANDIDATES */}
 
           <Route
             path="candidates"
@@ -304,6 +317,13 @@ function App() {
           <Route
             path="onboarding"
             element={<FacultyOnboarding />}
+          />
+
+          {/* FACULTY OPPORTUNITIES */}
+
+          <Route
+            path="opportunities"
+            element={<FacultyOpportunitiesPage />}
           />
         </Route>
       </Routes>
