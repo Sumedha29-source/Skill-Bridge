@@ -16,6 +16,10 @@ function CollegeLayout() {
   return (
     <div className="college-shell">
       <aside className="college-sidebar">
+        {/* =========================
+            LOGO
+        ========================= */}
+
         <button
           type="button"
           className="college-sidebar-logo"
@@ -47,10 +51,18 @@ function CollegeLayout() {
           </span>
         </button>
 
+        {/* =========================
+            WORKSPACE LABEL
+        ========================= */}
+
         <div className="college-sidebar-role">
           <span className="college-role-dot"></span>
           College workspace
         </div>
+
+        {/* =========================
+            NAVIGATION
+        ========================= */}
 
         <nav className="college-sidebar-nav">
           {/* DASHBOARD */}
@@ -90,6 +102,8 @@ function CollegeLayout() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M4 20V8l8-4 8 4v12" />
               <path d="M8 20v-6h8v6M9 10h.01M15 10h.01" />
@@ -111,6 +125,8 @@ function CollegeLayout() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <circle cx="9" cy="8" r="3" />
               <circle cx="17" cy="10" r="2" />
@@ -133,11 +149,39 @@ function CollegeLayout() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />
             </svg>
 
             Skill gap map
+          </NavLink>
+
+          {/* ANALYTICS */}
+
+          <NavLink
+            to="/college/analytics"
+            className={({ isActive }) =>
+              `college-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 19V14" />
+              <path d="M9 19V10" />
+              <path d="M14 19V5" />
+              <path d="M19 19V8" />
+              <path d="M2 19h20" />
+            </svg>
+
+            Analytics
           </NavLink>
 
           {/* TRAINING */}
@@ -153,6 +197,8 @@ function CollegeLayout() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M4 5h16v14H4z" />
               <path d="M8 9h8M8 13h5" />
@@ -161,6 +207,10 @@ function CollegeLayout() {
             Training
           </NavLink>
         </nav>
+
+        {/* =========================
+            USER / LOGOUT
+        ========================= */}
 
         <div className="college-sidebar-bottom">
           <div className="college-user-card">
@@ -178,6 +228,10 @@ function CollegeLayout() {
         </div>
       </aside>
 
+      {/* =========================
+          MAIN AREA
+      ========================= */}
+
       <div className="college-main-area">
         <header className="college-topbar">
           <span className="college-topbar-kicker">
@@ -187,9 +241,7 @@ function CollegeLayout() {
           <button
             type="button"
             className="college-department-shortcut"
-            onClick={() =>
-              navigate("/college/departments")
-            }
+            onClick={() => navigate("/college/departments")}
           >
             Manage departments
           </button>

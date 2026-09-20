@@ -17,6 +17,7 @@ function RecruiterLayout() {
     <div className="recruiter-shell">
       <aside className="recruiter-sidebar">
         {/* LOGO */}
+
         <button
           type="button"
           className="recruiter-sidebar-logo"
@@ -49,14 +50,17 @@ function RecruiterLayout() {
         </button>
 
         {/* WORKSPACE LABEL */}
+
         <div className="recruiter-sidebar-role">
           <span className="recruiter-role-dot"></span>
           Recruiter workspace
         </div>
 
         {/* NAVIGATION */}
+
         <nav className="recruiter-sidebar-nav">
           {/* DASHBOARD */}
+
           <NavLink
             to="/recruiter"
             end
@@ -80,6 +84,7 @@ function RecruiterLayout() {
           </NavLink>
 
           {/* STUDENT OPPORTUNITIES */}
+
           <NavLink
             to="/recruiter/opportunities"
             className={({ isActive }) =>
@@ -100,6 +105,7 @@ function RecruiterLayout() {
           </NavLink>
 
           {/* FACULTY COLLABORATIONS */}
+
           <NavLink
             to="/recruiter/faculty-opportunities"
             className={({ isActive }) =>
@@ -123,6 +129,7 @@ function RecruiterLayout() {
           </NavLink>
 
           {/* CANDIDATES */}
+
           <NavLink
             to="/recruiter/candidates"
             className={({ isActive }) =>
@@ -146,6 +153,7 @@ function RecruiterLayout() {
           </NavLink>
 
           {/* SHORTLIST */}
+
           <NavLink
             to="/recruiter/shortlist"
             className={({ isActive }) =>
@@ -164,9 +172,63 @@ function RecruiterLayout() {
 
             Shortlist
           </NavLink>
+
+          {/* INTERNSHIP TRACKING */}
+
+          <NavLink
+            to="/recruiter/internships"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 5h16v14H4z" />
+              <path d="M8 5V3M16 5V3" />
+              <path d="M8 11h8" />
+              <path d="M8 15h5" />
+              <path d="M18 14v5" />
+              <path d="M15.5 16.5H20.5" />
+            </svg>
+
+            Internship tracking
+          </NavLink>
+
+          {/* ANALYTICS */}
+
+          <NavLink
+            to="/recruiter/analytics"
+            className={({ isActive }) =>
+              `recruiter-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 19V14" />
+              <path d="M9 19V10" />
+              <path d="M14 19V5" />
+              <path d="M19 19V8" />
+              <path d="M2 19h20" />
+            </svg>
+
+            Analytics
+          </NavLink>
         </nav>
 
         {/* USER / LOGOUT */}
+
         <div className="recruiter-sidebar-bottom">
           <div className="recruiter-user-card">
             <div className="recruiter-avatar">
@@ -184,6 +246,7 @@ function RecruiterLayout() {
       </aside>
 
       {/* MAIN CONTENT */}
+
       <div className="recruiter-main-area">
         <header className="recruiter-topbar">
           <span className="recruiter-topbar-kicker">

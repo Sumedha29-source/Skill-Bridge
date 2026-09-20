@@ -519,7 +519,9 @@ function CandidateDetails() {
       setStatusSuccess(
         nextStatus === "shortlisted"
           ? "Candidate shortlisted successfully."
-          : "Application rejected successfully."
+          : nextStatus === "selected"
+            ? "Candidate selected successfully."
+            : "Application rejected successfully."
       );
     } catch (updateError) {
       console.error("Application status update error:", updateError);
@@ -1096,6 +1098,19 @@ function CandidateDetails() {
                   : application?.status === "shortlisted"
                     ? "Shortlisted ✓"
                     : "Shortlist candidate"}
+              </button>
+
+              <button
+                type="button"
+                className="candidate-details-shortlist-button"
+                disabled={statusUpdating || application?.status === "selected"}
+                onClick={() => updateApplicationStatus("selected")}
+              >
+                {statusUpdating
+                  ? "Updating..."
+                  : application?.status === "selected"
+                    ? "Selected ✓"
+                    : "Select candidate"}
               </button>
 
               <button
