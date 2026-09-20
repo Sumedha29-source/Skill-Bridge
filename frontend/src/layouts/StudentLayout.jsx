@@ -71,9 +71,7 @@ function StudentLayout() {
             to="/student"
             end
             className={({ isActive }) =>
-              `student-nav-item ${
-                isActive ? "active" : ""
-              }`
+              `student-nav-item ${isActive ? "active" : ""}`
             }
           >
             <svg
@@ -82,37 +80,10 @@ function StudentLayout() {
               stroke="currentColor"
               strokeWidth="2"
             >
-              <rect
-                x="3"
-                y="3"
-                width="7"
-                height="7"
-                rx="1"
-              />
-
-              <rect
-                x="14"
-                y="3"
-                width="7"
-                height="7"
-                rx="1"
-              />
-
-              <rect
-                x="3"
-                y="14"
-                width="7"
-                height="7"
-                rx="1"
-              />
-
-              <rect
-                x="14"
-                y="14"
-                width="7"
-                height="7"
-                rx="1"
-              />
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
 
             Dashboard
@@ -123,9 +94,7 @@ function StudentLayout() {
           <NavLink
             to="/student/profile"
             className={({ isActive }) =>
-              `student-nav-item ${
-                isActive ? "active" : ""
-              }`
+              `student-nav-item ${isActive ? "active" : ""}`
             }
           >
             <svg
@@ -135,7 +104,6 @@ function StudentLayout() {
               strokeWidth="2"
             >
               <circle cx="12" cy="8" r="4" />
-
               <path d="M4 21c.8-4.2 3.4-6 8-6s7.2 1.8 8 6" />
             </svg>
 
@@ -147,9 +115,7 @@ function StudentLayout() {
           <NavLink
             to="/student/assessment"
             className={({ isActive }) =>
-              `student-nav-item ${
-                isActive ? "active" : ""
-              }`
+              `student-nav-item ${isActive ? "active" : ""}`
             }
           >
             <svg
@@ -158,14 +124,7 @@ function StudentLayout() {
               stroke="currentColor"
               strokeWidth="2"
             >
-              <rect
-                x="5"
-                y="5"
-                width="14"
-                height="16"
-                rx="2"
-              />
-
+              <rect x="5" y="5" width="14" height="16" rx="2" />
               <path d="M9 5V3h6v2" />
               <path d="m9 12 2 2 4-5" />
               <path d="M9 17h6" />
@@ -179,9 +138,7 @@ function StudentLayout() {
           <NavLink
             to="/student/opportunities"
             className={({ isActive }) =>
-              `student-nav-item ${
-                isActive ? "active" : ""
-              }`
+              `student-nav-item ${isActive ? "active" : ""}`
             }
           >
             <svg
@@ -202,9 +159,7 @@ function StudentLayout() {
           <NavLink
             to="/student/roadmap"
             className={({ isActive }) =>
-              `student-nav-item ${
-                isActive ? "active" : ""
-              }`
+              `student-nav-item ${isActive ? "active" : ""}`
             }
           >
             <svg
@@ -218,6 +173,31 @@ function StudentLayout() {
 
             Skill roadmap
           </NavLink>
+
+          {/* INTERNSHIP PROGRESS */}
+
+          <NavLink
+            to="/student/internship-progress"
+            className={({ isActive }) =>
+              `student-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 7h16v13H4z" />
+              <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <path d="M4 12h16" />
+              <path d="M9 12v2h6v-2" />
+            </svg>
+
+            Internship Progress
+          </NavLink>
         </nav>
 
         {/* =========================
@@ -227,19 +207,12 @@ function StudentLayout() {
         <div className="student-sidebar-bottom">
           <div className="student-user-card">
             <div className="student-avatar">
-              {studentName
-                .charAt(0)
-                .toUpperCase()}
+              {studentName.charAt(0).toUpperCase()}
             </div>
 
             <div className="student-user-copy">
-              <strong>
-                {studentName}
-              </strong>
-
-              <span>
-                {user?.email || ""}
-              </span>
+              <strong>{studentName}</strong>
+              <span>{user?.email || ""}</span>
             </div>
           </div>
 
@@ -262,9 +235,7 @@ function StudentLayout() {
           <button
             type="button"
             className="student-profile-shortcut"
-            onClick={() =>
-              navigate("/student/profile")
-            }
+            onClick={() => navigate("/student/profile")}
           >
             View profile
           </button>

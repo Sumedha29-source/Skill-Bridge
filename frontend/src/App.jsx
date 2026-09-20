@@ -17,7 +17,7 @@ import Shortlist from "./pages/recruiter/Shortlist";
 import CreateFacultyOpportunity from "./pages/recruiter/CreateFacultyOpportunity";
 import FacultyOpportunities from "./pages/recruiter/FacultyOpportunities";
 import RecruiterAnalytics from "./pages/recruiter/Analytics";
-import InternshipTracking from "./pages/recruiter/InternshipTracking";
+import RecruiterInternshipTracking from "./pages/recruiter/InternshipTracking";
 
 /* =========================
    COLLEGE PAGES
@@ -39,6 +39,7 @@ import StudentOpportunities from "./pages/student/StudentOpportunities";
 import Assessment from "./pages/student/Assessment";
 import TakeAssessment from "./pages/student/TakeAssessment";
 import SkillRoadmap from "./pages/student/SkillRoadmap";
+import StudentInternshipTracking from "./pages/student/InternshipTracking";
 
 /* =========================
    FACULTY PAGES
@@ -167,6 +168,13 @@ function App() {
             path="roadmap"
             element={<SkillRoadmap />}
           />
+
+          {/* INTERNSHIP PROGRESS */}
+
+          <Route
+            path="internship-progress"
+            element={<StudentInternshipTracking />}
+          />
         </Route>
 
         {/* =====================================================
@@ -242,7 +250,7 @@ function App() {
 
           <Route
             path="internships"
-            element={<InternshipTracking />}
+            element={<RecruiterInternshipTracking />}
           />
 
           {/* RECRUITMENT ANALYTICS */}

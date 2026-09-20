@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../services/supabase";
 import { useAuth } from "../../hooks/useAuth";
+
 import "./InternshipTracking.css";
 
 function InternshipTracking() {
@@ -26,6 +27,12 @@ function InternshipTracking() {
 
     async function loadInternships() {
       try {
+        setLoading(true);
+
+        /* =========================
+           STUDENT PROFILE
+        ========================= */
+
         const {
           data: studentProfile,
           error: studentError,
@@ -83,20 +90,23 @@ function InternshipTracking() {
           throw applicationError;
         }
 
-        const selectedApplications = applications || [];
+        const selectedApplications =
+          applications || [];
 
         if (selectedApplications.length === 0) {
           if (!cancelled) {
             setRecords([]);
+            setError("");
             setLoading(false);
           }
 
           return;
         }
 
-        const applicationIds = selectedApplications.map(
-          (application) => application.id
-        );
+        const applicationIds =
+          selectedApplications.map(
+            (application) => application.id
+          );
 
         const opportunityIds = [
           ...new Set(
@@ -127,6 +137,11 @@ function InternshipTracking() {
 
         /* =========================
            OPPORTUNITIES
+
+           IMPORTANT:
+           opportunity_type was removed
+           because that column does not
+           exist in the opportunities table.
         ========================= */
 
         let opportunities = [];
@@ -143,8 +158,7 @@ function InternshipTracking() {
               company_id,
               title,
               description,
-              location,
-              opportunity_type
+              location
             `
             )
             .in("id", opportunityIds);
@@ -153,7 +167,8 @@ function InternshipTracking() {
             throw opportunityError;
           }
 
-          opportunities = opportunityData || [];
+          opportunities =
+            opportunityData || [];
         }
 
         /* =========================
@@ -188,50 +203,66 @@ function InternshipTracking() {
               companyError
             );
           } else {
-            companies = companyData || [];
+            companies =
+              companyData || [];
           }
         }
 
         /* =========================
-           COMBINE DATA
+           COMBINE EVERYTHING
         ========================= */
 
-        const combinedRecords = selectedApplications
-          .map((application) => {
-            const progress = (progressRows || []).find(
-              (item) =>
-                item.application_id === application.id
-            );
-
-            if (!progress) {
-              return null;
-            }
-
-            const opportunity =
-              opportunities.find(
+        const combinedRecords =
+          selectedApplications
+            .map((application) => {
+              const progress = (
+                progressRows || []
+              ).find(
                 (item) =>
-                  item.id ===
-                  application.opportunity_id
-              ) || null;
+                  item.application_id ===
+                  application.id
+              );
 
-            const company =
-              companies.find(
-                (item) =>
-                  item.id ===
-                  opportunity?.company_id
-              ) || null;
+              /*
+               Only show selected applications
+               that actually have an
+               internship_progress record.
+              */
 
-            return {
-              ...progress,
-              application,
-              opportunity,
-              company,
-              studentProfile,
-              draftStudentUpdate:
-                progress.student_update || "",
-            };
-          })
-          .filter(Boolean);
+              if (!progress) {
+                return null;
+              }
+
+              const opportunity =
+                opportunities.find(
+                  (item) =>
+                    item.id ===
+                    application.opportunity_id
+                ) || null;
+
+              const company =
+                companies.find(
+                  (item) =>
+                    item.id ===
+                    opportunity?.company_id
+                ) || null;
+
+              return {
+                ...progress,
+
+                application,
+
+                opportunity,
+
+                company,
+
+                studentProfile,
+
+                draftStudentUpdate:
+                  progress.student_update || "",
+              };
+            })
+            .filter(Boolean);
 
         if (!cancelled) {
           setRecords(combinedRecords);
@@ -266,7 +297,10 @@ function InternshipTracking() {
      STUDENT UPDATE INPUT
   ========================= */
 
-  function handleUpdateChange(recordId, value) {
+  function handleUpdateChange(
+    recordId,
+    value
+  ) {
     setRecords((currentRecords) =>
       currentRecords.map((record) =>
         record.id === recordId
@@ -294,14 +328,16 @@ function InternshipTracking() {
       setSuccess("");
 
       const updateText =
-        record.draftStudentUpdate?.trim() || null;
+        record.draftStudentUpdate?.trim() ||
+        null;
 
-      const { error: updateError } = await supabase
-        .from("internship_progress")
-        .update({
-          student_update: updateText,
-        })
-        .eq("id", record.id);
+      const { error: updateError } =
+        await supabase
+          .from("internship_progress")
+          .update({
+            student_update: updateText,
+          })
+          .eq("id", record.id);
 
       if (updateError) {
         throw updateError;
@@ -312,7 +348,10 @@ function InternshipTracking() {
           currentRecord.id === record.id
             ? {
                 ...currentRecord,
-                student_update: updateText,
+
+                student_update:
+                  updateText,
+
                 draftStudentUpdate:
                   updateText || "",
               }
@@ -359,14 +398,13 @@ function InternshipTracking() {
       return "—";
     }
 
-    return new Date(value).toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
+    return new Date(
+      value
+    ).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   function getProgress(record) {
@@ -408,6 +446,34 @@ function InternshipTracking() {
     );
   }
 
+  /* =========================
+     CALCULATIONS
+  ========================= */
+
+  const ongoingCount = records.filter(
+    (record) =>
+      record.current_status === "ongoing"
+  ).length;
+
+  const completedCount = records.filter(
+    (record) =>
+      record.current_status ===
+        "completed" ||
+      record.completion_status ===
+        "completed"
+  ).length;
+
+  const averageProgress =
+    records.length > 0
+      ? Math.round(
+          records.reduce(
+            (sum, record) =>
+              sum + getProgress(record),
+            0
+          ) / records.length
+        )
+      : 0;
+
   return (
     <div className="student-internship-page">
       {/* =========================
@@ -420,12 +486,14 @@ function InternshipTracking() {
         </p>
 
         <h1>
-          My Internship <span>Progress</span>
+          My Internship{" "}
+          <span>Progress</span>
         </h1>
 
         <p className="student-internship-subtitle">
-          Follow your internship journey, review mentor
-          feedback and keep your industry mentor updated on
+          Follow your internship journey,
+          review mentor feedback and keep
+          your industry mentor updated on
           your progress.
         </p>
       </section>
@@ -454,7 +522,9 @@ function InternshipTracking() {
         <div className="student-internship-stat">
           <span>Internships</span>
 
-          <strong>{records.length}</strong>
+          <strong>
+            {records.length}
+          </strong>
 
           <small>
             Selected internship records
@@ -465,12 +535,7 @@ function InternshipTracking() {
           <span>Ongoing</span>
 
           <strong>
-            {
-              records.filter(
-                (record) =>
-                  record.current_status === "ongoing"
-              ).length
-            }
+            {ongoingCount}
           </strong>
 
           <small>
@@ -482,13 +547,7 @@ function InternshipTracking() {
           <span>Completed</span>
 
           <strong>
-            {
-              records.filter(
-                (record) =>
-                  record.current_status === "completed" ||
-                  record.completion_status === "completed"
-              ).length
-            }
+            {completedCount}
           </strong>
 
           <small>
@@ -497,19 +556,12 @@ function InternshipTracking() {
         </div>
 
         <div className="student-internship-stat">
-          <span>Average progress</span>
+          <span>
+            Average progress
+          </span>
 
           <strong>
-            {records.length > 0
-              ? Math.round(
-                  records.reduce(
-                    (sum, record) =>
-                      sum + getProgress(record),
-                    0
-                  ) / records.length
-                )
-              : 0}
-            %
+            {averageProgress}%
           </strong>
 
           <small>
@@ -522,21 +574,24 @@ function InternshipTracking() {
           EMPTY STATE
       ========================= */}
 
-      {records.length === 0 && (
-        <section className="student-internship-empty">
-          <span>◎</span>
+      {records.length === 0 &&
+        !error && (
+          <section className="student-internship-empty">
+            <span>◎</span>
 
-          <h2>
-            No internship tracking yet
-          </h2>
+            <h2>
+              No internship tracking yet
+            </h2>
 
-          <p>
-            Once you are selected for an internship and your
-            recruiter starts tracking it, the progress record
-            will appear here.
-          </p>
-        </section>
-      )}
+            <p>
+              Once you are selected for an
+              internship and your recruiter
+              starts tracking it, the
+              progress record will appear
+              here.
+            </p>
+          </section>
+        )}
 
       {/* =========================
           INTERNSHIP CARDS
@@ -544,7 +599,8 @@ function InternshipTracking() {
 
       <section className="student-internship-list">
         {records.map((record) => {
-          const progress = getProgress(record);
+          const progress =
+            getProgress(record);
 
           return (
             <article
@@ -560,20 +616,26 @@ function InternshipTracking() {
                   </p>
 
                   <h2>
-                    {record.opportunity?.title ||
+                    {record.opportunity
+                      ?.title ||
                       "Internship"}
                   </h2>
 
                   <p className="student-internship-company">
-                    {record.company?.name ||
+                    {record.company
+                      ?.name ||
                       "Industry partner"}
                   </p>
                 </div>
 
                 <div className="student-internship-progress-number">
-                  <span>// PROGRESS</span>
+                  <span>
+                    // PROGRESS
+                  </span>
 
-                  <strong>{progress}%</strong>
+                  <strong>
+                    {progress}%
+                  </strong>
                 </div>
               </div>
 
@@ -602,7 +664,9 @@ function InternshipTracking() {
                 </div>
 
                 <div>
-                  <span>Completion</span>
+                  <span>
+                    Completion
+                  </span>
 
                   <strong>
                     {formatStatus(
@@ -650,11 +714,14 @@ function InternshipTracking() {
 
                   {record.mentor_feedback ? (
                     <p className="student-internship-feedback">
-                      {record.mentor_feedback}
+                      {
+                        record.mentor_feedback
+                      }
                     </p>
                   ) : (
                     <p className="student-internship-muted">
-                      Your mentor has not added feedback yet.
+                      Your mentor has not
+                      added feedback yet.
                     </p>
                   )}
                 </section>
@@ -671,8 +738,10 @@ function InternshipTracking() {
                   </h3>
 
                   <p className="student-internship-help">
-                    Share what you have worked on, learned or
-                    completed during your internship.
+                    Share what you have
+                    worked on, learned or
+                    completed during your
+                    internship.
                   </p>
 
                   <textarea
@@ -693,13 +762,17 @@ function InternshipTracking() {
                     type="button"
                     className="student-internship-save"
                     disabled={
-                      savingId === record.id
+                      savingId ===
+                      record.id
                     }
                     onClick={() =>
-                      saveStudentUpdate(record)
+                      saveStudentUpdate(
+                        record
+                      )
                     }
                   >
-                    {savingId === record.id
+                    {savingId ===
+                    record.id
                       ? "Saving..."
                       : "Save progress update"}
                   </button>
