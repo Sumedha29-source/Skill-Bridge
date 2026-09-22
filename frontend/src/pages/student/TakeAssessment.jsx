@@ -12,6 +12,8 @@ function TakeAssessment() {
 
   const [skill, setSkill] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [assessmentType, setAssessmentType] = useState("technical");
+
   const [studentProfile, setStudentProfile] = useState(null);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -39,6 +41,13 @@ function TakeAssessment() {
 
     async function loadAssessment() {
       try {
+        setLoading(true);
+        setError("");
+
+        /* -------------------------
+           STUDENT PROFILE
+        ------------------------- */
+
         const { data: profileData, error: profileError } =
           await supabase
             .from("student_profiles")
@@ -49,6 +58,10 @@ function TakeAssessment() {
         if (profileError) {
           throw profileError;
         }
+
+        /* -------------------------
+           SKILL
+        ------------------------- */
 
         const { data: skillData, error: skillError } =
           await supabase
@@ -61,10 +74,13 @@ function TakeAssessment() {
           throw skillError;
         }
 
-        /*
-          We now need correct_option because the browser
-          calculates the assessment result on submission.
-        */
+        /* -------------------------
+           QUESTIONS
+
+           Do NOT restrict this to technical.
+           The skill itself determines which
+           assessment is being opened.
+        ------------------------- */
 
         const { data: questionData, error: questionError } =
           await supabase
@@ -77,10 +93,10 @@ function TakeAssessment() {
               option_c,
               option_d,
               correct_option,
-              difficulty
+              difficulty,
+              question_type
             `)
-            .eq("skill_id", skillId)
-            .eq("question_type", "technical");
+            .eq("skill_id", skillId);
 
         if (questionError) {
           throw questionError;
@@ -92,13 +108,27 @@ function TakeAssessment() {
           );
         }
 
+        /*
+         * Every assessment card represents one skill.
+         * Questions for that skill should belong to
+         * one assessment type.
+         */
+
+        const detectedType =
+          questionData[0]?.question_type || "technical";
+
+        const relevantQuestions = questionData.filter(
+          (question) =>
+            question.question_type === detectedType
+        );
+
         const difficultyOrder = {
           beginner: 1,
           intermediate: 2,
           advanced: 3,
         };
 
-        const sortedQuestions = [...questionData].sort(
+        const sortedQuestions = [...relevantQuestions].sort(
           (a, b) =>
             (difficultyOrder[a.difficulty] || 99) -
             (difficultyOrder[b.difficulty] || 99)
@@ -108,6 +138,13 @@ function TakeAssessment() {
           setStudentProfile(profileData);
           setSkill(skillData);
           setQuestions(sortedQuestions);
+          setAssessmentType(detectedType);
+
+          setCurrentQuestion(0);
+          setAnswers({});
+          setAttemptId(null);
+          setResult(null);
+
           setError("");
         }
       } catch (err) {
@@ -134,6 +171,43 @@ function TakeAssessment() {
   }, [user, skillId]);
 
   /* =========================
+     ASSESSMENT LABELS
+  ========================= */
+
+  function getAssessmentLabel() {
+    if (assessmentType === "aptitude") {
+      return "Aptitude assessment";
+    }
+
+    if (assessmentType === "soft_skill") {
+      return "Soft skill assessment";
+    }
+
+    return "Technical assessment";
+  }
+
+  function getAssessmentDescription() {
+    if (assessmentType === "aptitude") {
+      return (
+        "This assessment measures reasoning, quantitative " +
+        "aptitude and analytical problem-solving ability."
+      );
+    }
+
+    if (assessmentType === "soft_skill") {
+      return (
+        "This situational assessment evaluates how you " +
+        "approach common workplace and team scenarios."
+      );
+    }
+
+    return (
+      "This assessment measures your current technical " +
+      `${skill?.name || "skill"} proficiency.`
+    );
+  }
+
+  /* =========================
      START ATTEMPT
   ========================= */
 
@@ -146,11 +220,29 @@ function TakeAssessment() {
       setStarting(true);
       setError("");
 
+      /*
+       * Existing technical assessments use "skill"
+       * in assessment_attempts.
+       *
+       * Aptitude and soft-skill assessments use their
+       * dedicated database-supported values.
+       */
+
+      let attemptType = "skill";
+
+      if (assessmentType === "aptitude") {
+        attemptType = "aptitude";
+      }
+
+      if (assessmentType === "soft_skill") {
+        attemptType = "soft_skill";
+      }
+
       const { data, error: attemptError } = await supabase
         .from("assessment_attempts")
         .insert({
           student_id: studentProfile.id,
-          assessment_type: "skill",
+          assessment_type: attemptType,
           status: "in_progress",
           total_questions: questions.length,
           correct_answers: 0,
@@ -200,13 +292,17 @@ function TakeAssessment() {
 
   function goNext() {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((previous) => previous + 1);
+      setCurrentQuestion(
+        (previous) => previous + 1
+      );
     }
   }
 
   function goPrevious() {
     if (currentQuestion > 0) {
-      setCurrentQuestion((previous) => previous - 1);
+      setCurrentQuestion(
+        (previous) => previous - 1
+      );
     }
   }
 
@@ -224,10 +320,6 @@ function TakeAssessment() {
       return;
     }
 
-    /*
-      Make sure every question has an answer.
-    */
-
     const unansweredQuestions = questions.filter(
       (question) => !answers[question.id]
     );
@@ -236,6 +328,7 @@ function TakeAssessment() {
       setError(
         `Please answer all ${questions.length} questions before submitting.`
       );
+
       return;
     }
 
@@ -243,14 +336,15 @@ function TakeAssessment() {
       setSubmitting(true);
       setError("");
 
-      /*
-        Calculate correct answers.
-      */
+      /* -------------------------
+         CALCULATE ANSWERS
+      ------------------------- */
 
       let correctAnswers = 0;
 
       const answerRows = questions.map((question) => {
-        const selectedOption = answers[question.id];
+        const selectedOption =
+          answers[question.id];
 
         const isCorrect =
           selectedOption === question.correct_option;
@@ -268,29 +362,32 @@ function TakeAssessment() {
         };
       });
 
-      /*
-        Calculate percentage.
-      */
+      /* -------------------------
+         SCORE
+      ------------------------- */
 
       const score = Math.round(
         (correctAnswers / questions.length) * 100
       );
 
-      /*
-        Convert result into proficiency.
-      */
+      /* -------------------------
+         PROFICIENCY
+
+         Percentage based so this works for
+         assessments of different lengths.
+      ------------------------- */
 
       let proficiency = "beginner";
 
-      if (correctAnswers >= 5) {
+      if (score >= 80) {
         proficiency = "advanced";
-      } else if (correctAnswers >= 3) {
+      } else if (score >= 50) {
         proficiency = "intermediate";
       }
 
-      /*
-        1. SAVE ANSWERS
-      */
+      /* -------------------------
+         1. SAVE ANSWERS
+      ------------------------- */
 
       const { error: answerError } = await supabase
         .from("assessment_answers")
@@ -300,9 +397,9 @@ function TakeAssessment() {
         throw answerError;
       }
 
-      /*
-        2. COMPLETE ATTEMPT
-      */
+      /* -------------------------
+         2. COMPLETE ATTEMPT
+      ------------------------- */
 
       const { error: attemptError } = await supabase
         .from("assessment_attempts")
@@ -318,37 +415,43 @@ function TakeAssessment() {
         throw attemptError;
       }
 
-      /*
-        3. UPDATE VERIFIED STUDENT SKILL
+      /* -------------------------
+         3. UPDATE ASSESSED SKILL
 
-        Because student_id + skill_id is unique,
-        upsert will update an existing Python skill
-        instead of creating a duplicate.
-      */
+         All three assessment types can contribute
+         to the student's measured skill profile.
 
-      const { error: skillError } = await supabase
-        .from("student_skills")
-        .upsert(
-          {
-            student_id: studentProfile.id,
-            skill_id: skill.id,
-            proficiency,
-            source: "assessment",
-            verified: true,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: "student_id,skill_id",
-          }
-        );
+         source = assessment
+         verified = true
 
-      if (skillError) {
-        throw skillError;
+         means SkillBridge has assessed the skill.
+      ------------------------- */
+
+      const { error: studentSkillError } =
+        await supabase
+          .from("student_skills")
+          .upsert(
+            {
+              student_id: studentProfile.id,
+              skill_id: skill.id,
+              proficiency,
+              source: "assessment",
+              verified: true,
+              updated_at: new Date().toISOString(),
+            },
+            {
+              onConflict:
+                "student_id,skill_id",
+            }
+          );
+
+      if (studentSkillError) {
+        throw studentSkillError;
       }
 
-      /*
-        4. SHOW RESULT
-      */
+      /* -------------------------
+         4. RESULT
+      ------------------------- */
 
       setResult({
         correctAnswers,
@@ -357,7 +460,10 @@ function TakeAssessment() {
         proficiency,
       });
     } catch (err) {
-      console.error("Assessment submission error:", err);
+      console.error(
+        "Assessment submission error:",
+        err
+      );
 
       setError(
         err?.message ||
@@ -458,14 +564,17 @@ function TakeAssessment() {
           </div>
 
           <div className="take-assessment-note">
-            <strong>Verified skill updated</strong>
+            <strong>
+              Assessment-verified skill updated
+            </strong>
 
             <p>
-              Your {skill?.name} proficiency is now marked as{" "}
+              Your {skill?.name} proficiency is now
+              recorded as{" "}
               <strong>
                 {result.proficiency}
               </strong>{" "}
-              and verified through SkillBridge assessment.
+              based on this SkillBridge assessment.
             </p>
           </div>
 
@@ -517,15 +626,13 @@ function TakeAssessment() {
 
         <section className="take-assessment-intro">
           <span className="take-assessment-kicker">
-            // technical assessment
+            // {getAssessmentLabel()}
           </span>
 
           <h1>{skill?.name} Assessment</h1>
 
           <p>
-            This assessment contains {questions.length} questions
-            across beginner, intermediate and advanced difficulty
-            levels.
+            {getAssessmentDescription()}
           </p>
 
           <div className="take-assessment-rules">
@@ -549,11 +656,25 @@ function TakeAssessment() {
             <strong>Before you begin</strong>
 
             <p>
-              Complete all questions before submitting. Your result
-              will determine your assessed proficiency in{" "}
-              {skill?.name}.
+              Complete all questions before submitting.
+              Your result will be used to estimate your{" "}
+              {skill?.name} proficiency.
             </p>
           </div>
+
+          {assessmentType === "soft_skill" && (
+            <div className="take-assessment-note">
+              <strong>
+                Situational assessment
+              </strong>
+
+              <p>
+                Choose the response that best represents
+                the most effective approach to each
+                workplace situation.
+              </p>
+            </div>
+          )}
 
           {error && (
             <div className="take-assessment-error">
@@ -594,10 +715,13 @@ function TakeAssessment() {
     );
   }
 
-  const selectedAnswer = answers[question.id];
+  const selectedAnswer =
+    answers[question.id];
 
   const progress =
-    ((currentQuestion + 1) / questions.length) * 100;
+    ((currentQuestion + 1) /
+      questions.length) *
+    100;
 
   return (
     <div className="take-assessment-page">
@@ -605,10 +729,10 @@ function TakeAssessment() {
         <div className="take-assessment-quiz-header">
           <div>
             <span className="take-assessment-kicker">
-              // {skill?.name}
+              // {getAssessmentLabel()}
             </span>
 
-            <h1>Skill Assessment</h1>
+            <h1>{skill?.name}</h1>
           </div>
 
           <div className="take-assessment-progress-copy">

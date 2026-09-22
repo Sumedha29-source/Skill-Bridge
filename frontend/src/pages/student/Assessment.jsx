@@ -11,11 +11,116 @@ function Assessment() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  /* =========================
+     LOAD ASSESSMENTS
+  ========================= */
+
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadAssessments() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const { data: questions, error: questionError } =
+          await supabase
+            .from("assessment_questions")
+            .select(`
+              id,
+              difficulty,
+              question_type,
+              skill_id,
+              skills (
+                id,
+                name,
+                category
+              )
+            `);
+
+        if (questionError) {
+          throw questionError;
+        }
+
+        const skillMap = {};
+
+        (questions || []).forEach((question) => {
+          const skill = question.skills;
+
+          if (!skill) {
+            return;
+          }
+
+          /*
+           * The combination of skill + question type
+           * represents one assessment.
+           */
+
+          const mapKey = `${skill.id}-${question.question_type}`;
+
+          if (!skillMap[mapKey]) {
+            skillMap[mapKey] = {
+              id: skill.id,
+              name: skill.name,
+              category: skill.category,
+              questionType: question.question_type,
+
+              questionCount: 0,
+              beginnerCount: 0,
+              intermediateCount: 0,
+              advancedCount: 0,
+            };
+          }
+
+          skillMap[mapKey].questionCount += 1;
+
+          if (question.difficulty === "beginner") {
+            skillMap[mapKey].beginnerCount += 1;
+          }
+
+          if (question.difficulty === "intermediate") {
+            skillMap[mapKey].intermediateCount += 1;
+          }
+
+          if (question.difficulty === "advanced") {
+            skillMap[mapKey].advancedCount += 1;
+          }
+        });
+
+        if (!cancelled) {
+          setAssessments(Object.values(skillMap));
+        }
+      } catch (err) {
+        console.error(
+          "Assessment loading error:",
+          err
+        );
+
+        if (!cancelled) {
+          setError(
+            err?.message ||
+              "Unable to load assessments. Please try again."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
     loadAssessments();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  async function loadAssessments() {
+  /* =========================
+     RETRY
+  ========================= */
+
+  async function retryLoadAssessments() {
     try {
       setLoading(true);
       setError("");
@@ -33,8 +138,7 @@ function Assessment() {
               name,
               category
             )
-          `)
-          .eq("question_type", "technical");
+          `);
 
       if (questionError) {
         throw questionError;
@@ -49,11 +153,16 @@ function Assessment() {
           return;
         }
 
-        if (!skillMap[skill.id]) {
-          skillMap[skill.id] = {
+        const mapKey =
+          `${skill.id}-${question.question_type}`;
+
+        if (!skillMap[mapKey]) {
+          skillMap[mapKey] = {
             id: skill.id,
             name: skill.name,
             category: skill.category,
+            questionType: question.question_type,
+
             questionCount: 0,
             beginnerCount: 0,
             intermediateCount: 0,
@@ -61,24 +170,27 @@ function Assessment() {
           };
         }
 
-        skillMap[skill.id].questionCount += 1;
+        skillMap[mapKey].questionCount += 1;
 
         if (question.difficulty === "beginner") {
-          skillMap[skill.id].beginnerCount += 1;
+          skillMap[mapKey].beginnerCount += 1;
         }
 
         if (question.difficulty === "intermediate") {
-          skillMap[skill.id].intermediateCount += 1;
+          skillMap[mapKey].intermediateCount += 1;
         }
 
         if (question.difficulty === "advanced") {
-          skillMap[skill.id].advancedCount += 1;
+          skillMap[mapKey].advancedCount += 1;
         }
       });
 
       setAssessments(Object.values(skillMap));
     } catch (err) {
-      console.error("Assessment loading error:", err);
+      console.error(
+        "Assessment loading error:",
+        err
+      );
 
       setError(
         err?.message ||
@@ -88,6 +200,200 @@ function Assessment() {
       setLoading(false);
     }
   }
+
+  /* =========================
+     GROUP ASSESSMENTS
+  ========================= */
+
+  const technicalAssessments = assessments.filter(
+    (assessment) =>
+      assessment.questionType === "technical"
+  );
+
+  const aptitudeAssessments = assessments.filter(
+    (assessment) =>
+      assessment.questionType === "aptitude"
+  );
+
+  const softSkillAssessments = assessments.filter(
+    (assessment) =>
+      assessment.questionType === "soft_skill"
+  );
+
+  /* =========================
+     HELPERS
+  ========================= */
+
+  function getTypeLabel(questionType) {
+    if (questionType === "aptitude") {
+      return "Aptitude";
+    }
+
+    if (questionType === "soft_skill") {
+      return "Soft Skill";
+    }
+
+    return "Technical";
+  }
+
+  function getDescription(assessment) {
+    if (assessment.questionType === "aptitude") {
+      return (
+        "Measure logical reasoning, quantitative aptitude " +
+        "and analytical problem-solving ability."
+      );
+    }
+
+    if (assessment.questionType === "soft_skill") {
+      return (
+        `Evaluate your ${assessment.name} approach through ` +
+        "situational workplace questions."
+      );
+    }
+
+    return (
+      `Measure your current ${assessment.name} proficiency ` +
+      "through a structured technical assessment."
+    );
+  }
+
+  /* =========================
+     ASSESSMENT CARD
+  ========================= */
+
+  function renderAssessmentCard(assessment) {
+    return (
+      <article
+        className="assessment-card"
+        key={`${assessment.id}-${assessment.questionType}`}
+      >
+        <div className="assessment-card-top">
+          <span className="assessment-category">
+            {getTypeLabel(
+              assessment.questionType
+            )}
+          </span>
+
+          <span className="assessment-question-count">
+            {assessment.questionCount} questions
+          </span>
+        </div>
+
+        <h3>{assessment.name}</h3>
+
+        <p className="assessment-card-description">
+          {getDescription(assessment)}
+        </p>
+
+        <div className="assessment-levels">
+          <div>
+            <strong>
+              {assessment.beginnerCount}
+            </strong>
+
+            <span>Beginner</span>
+          </div>
+
+          <div>
+            <strong>
+              {assessment.intermediateCount}
+            </strong>
+
+            <span>Intermediate</span>
+          </div>
+
+          <div>
+            <strong>
+              {assessment.advancedCount}
+            </strong>
+
+            <span>Advanced</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="assessment-start-button"
+          onClick={() =>
+            navigate(
+              `/student/assessment/${assessment.id}`
+            )
+          }
+        >
+          Start assessment
+          <span>→</span>
+        </button>
+      </article>
+    );
+  }
+
+  /* =========================
+     ASSESSMENT GROUP
+  ========================= */
+
+  function renderAssessmentGroup({
+    kicker,
+    title,
+    description,
+    items,
+  }) {
+    if (items.length === 0) {
+      return null;
+    }
+
+    return (
+      <div
+        style={{
+          marginTop: "34px",
+        }}
+      >
+        <div
+          className="assessment-section-heading"
+          style={{
+            marginBottom: "18px",
+          }}
+        >
+          <div>
+            <span className="assessment-kicker">
+              // {kicker}
+            </span>
+
+            <h2>{title}</h2>
+
+            <p
+              style={{
+                margin:
+                  "7px 0 0",
+                color: "#777",
+                fontSize: "13px",
+                lineHeight: "1.6",
+                maxWidth: "650px",
+              }}
+            >
+              {description}
+            </p>
+          </div>
+
+          <span className="assessment-count">
+            {items.length}{" "}
+            {items.length === 1
+              ? "assessment"
+              : "assessments"}
+          </span>
+        </div>
+
+        <div className="assessment-grid">
+          {items.map((assessment) =>
+            renderAssessmentCard(assessment)
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  /* =========================
+     LOADING
+  ========================= */
 
   if (loading) {
     return (
@@ -99,70 +405,83 @@ function Assessment() {
     );
   }
 
+  /* =========================
+     PAGE
+  ========================= */
+
   return (
     <div className="assessment-page">
-      {/* PAGE HEADER */}
+      {/* =========================
+          PAGE HEADER
+      ========================= */}
 
       <section className="assessment-header">
         <div>
           <span className="assessment-kicker">
-            // skill verification
+            // skill intelligence
           </span>
 
           <h1>Skill Assessment</h1>
 
           <p>
-            Test your skills and build a verified skill profile that
-            can improve your opportunity matches.
+            Build a measured SkillBridge profile across
+            technical ability, aptitude and workplace
+            soft skills.
           </p>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
+      {/* =========================
+          PROFILE DIMENSIONS
+      ========================= */}
 
       <section className="assessment-info-grid">
         <div className="assessment-info-card">
           <span>01</span>
 
-          <strong>Take assessment</strong>
+          <strong>Technical skills</strong>
 
           <p>
-            Answer questions across different difficulty levels.
+            Measure proficiency in practical technical
+            skills required by industry.
           </p>
         </div>
 
         <div className="assessment-info-card">
           <span>02</span>
 
-          <strong>Verify skill level</strong>
+          <strong>Aptitude</strong>
 
           <p>
-            Your performance is converted into a measured proficiency.
+            Evaluate reasoning, quantitative ability and
+            analytical problem solving.
           </p>
         </div>
 
         <div className="assessment-info-card">
           <span>03</span>
 
-          <strong>Improve matching</strong>
+          <strong>Soft skills</strong>
 
           <p>
-            Verified skills can contribute to your opportunity match
-            profile.
+            Evaluate workplace judgement across
+            communication, teamwork and leadership.
           </p>
         </div>
       </section>
 
-      {/* AVAILABLE ASSESSMENTS */}
+      {/* =========================
+          AVAILABLE ASSESSMENTS
+      ========================= */}
 
       <section className="assessment-list-section">
         <div className="assessment-section-heading">
           <div>
             <span className="assessment-kicker">
-              // available assessments
+              // assessment centre
             </span>
 
-            <h2>Choose a skill</h2>
+            <h2>Your assessment centre</h2>
           </div>
 
           <span className="assessment-count">
@@ -178,7 +497,7 @@ function Assessment() {
 
             <button
               type="button"
-              onClick={loadAssessments}
+              onClick={retryLoadAssessments}
             >
               Try again
             </button>
@@ -187,85 +506,50 @@ function Assessment() {
 
         {/* EMPTY */}
 
-        {!error && assessments.length === 0 && (
-          <div className="assessment-empty">
-            <h3>No assessments available yet</h3>
+        {!error &&
+          assessments.length === 0 && (
+            <div className="assessment-empty">
+              <h3>
+                No assessments available yet
+              </h3>
 
-            <p>
-              Skill assessments will appear here once questions are
-              available.
-            </p>
-          </div>
-        )}
+              <p>
+                Assessments will appear here once
+                questions are available.
+              </p>
+            </div>
+          )}
 
-        {/* ASSESSMENT CARDS */}
+        {/* GROUPS */}
 
-        {!error && assessments.length > 0 && (
-          <div className="assessment-grid">
-            {assessments.map((assessment) => (
-              <article
-                className="assessment-card"
-                key={assessment.id}
-              >
-                <div className="assessment-card-top">
-                  <span className="assessment-category">
-                    {assessment.category || "Skill"}
-                  </span>
+        {!error &&
+          assessments.length > 0 && (
+            <>
+              {renderAssessmentGroup({
+                kicker: "technical skills",
+                title: "Technical Skills",
+                description:
+                  "Demonstrate your technical proficiency and add assessment-verified skills to your profile.",
+                items: technicalAssessments,
+              })}
 
-                  <span className="assessment-question-count">
-                    {assessment.questionCount} questions
-                  </span>
-                </div>
+              {renderAssessmentGroup({
+                kicker: "aptitude",
+                title: "Aptitude",
+                description:
+                  "Measure reasoning, quantitative ability and analytical thinking used across job roles.",
+                items: aptitudeAssessments,
+              })}
 
-                <h3>{assessment.name}</h3>
-
-                <p className="assessment-card-description">
-                  Measure your current {assessment.name} proficiency
-                  through a structured technical assessment.
-                </p>
-
-                <div className="assessment-levels">
-                  <div>
-                    <strong>
-                      {assessment.beginnerCount}
-                    </strong>
-
-                    <span>Beginner</span>
-                  </div>
-
-                  <div>
-                    <strong>
-                      {assessment.intermediateCount}
-                    </strong>
-
-                    <span>Intermediate</span>
-                  </div>
-
-                  <div>
-                    <strong>
-                      {assessment.advancedCount}
-                    </strong>
-
-                    <span>Advanced</span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="assessment-start-button"
-                  onClick={() =>
-                    navigate(
-                      `/student/assessment/${assessment.id}`
-                    )
-                  }
-                >
-                  Start assessment
-                  <span>→</span>
-                </button>
-              </article>
-            ))}
-          </div>
-        )}
+              {renderAssessmentGroup({
+                kicker: "workplace capabilities",
+                title: "Soft Skills",
+                description:
+                  "Situational assessments that measure effective responses to common workplace scenarios.",
+                items: softSkillAssessments,
+              })}
+            </>
+          )}
       </section>
     </div>
   );

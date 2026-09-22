@@ -136,6 +136,31 @@ function CollegeLayout() {
             Students
           </NavLink>
 
+          {/* PORTFOLIO VERIFICATION */}
+
+          <NavLink
+            to="/college/portfolio-verification"
+            className={({ isActive }) =>
+              `college-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+              <path d="M9 8h6" />
+              <path d="M9 12h3" />
+              <path d="m9 16 2 2 4-4" />
+            </svg>
+
+            Portfolio verification
+          </NavLink>
+
           {/* SKILL GAP MAP */}
 
           <NavLink
