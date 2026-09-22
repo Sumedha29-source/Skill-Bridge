@@ -275,12 +275,13 @@ function Landing() {
         <section className="hero" id="home">
           <div className="hero-grid">
             <div className="hero-copy">
-              <div className="eyebrow">// connecting three worlds</div>
+              <div className="eyebrow">// connecting four worlds</div>
 
               <h1>
                 Bridging <span className="role-student">Students</span>,
                 <br />
-                <span className="role-college">Colleges</span> &amp;{" "}
+                <span className="role-college">Colleges</span>,{" "}
+                <span className="role-faculty">Faculty</span> &amp;{" "}
                 <span className="role-recruiter">Recruiters</span>
                 <br />
                 Together
@@ -288,8 +289,8 @@ function Landing() {
 
               <p className="lede">
                 One network where talent, education and opportunity meet — so
-                students grow, colleges empower, and recruiters discover
-                what&apos;s next.
+                students grow, colleges empower, faculty collaborate, and
+                recruiters discover what&apos;s next.
               </p>
 
               <div className="tag-row">
@@ -301,6 +302,11 @@ function Landing() {
                 <span className="tag ty">
                   <span className="sw"></span>
                   college
+                </span>
+
+                <span className="tag tb">
+                  <span className="sw"></span>
+                  faculty
                 </span>
 
                 <span className="tag tr">
@@ -387,6 +393,27 @@ function Landing() {
                 <div className="m-foot">
                   Partner institutions connected
                 </div>
+              </div>
+
+              <div className="mtile reveal">
+                <div className="m-label">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 3 2 8l10 5 8-4v6" />
+                    <path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5" />
+                  </svg>
+                  Faculty
+                </div>
+
+                <div className="m-val">1.2K</div>
+
+                <div className="m-foot">Academicians on the platform</div>
               </div>
 
               <div className="mtile reveal">
@@ -500,15 +527,16 @@ function Landing() {
                 <span className="accent-text">SkillBridge</span> is one
                 platform,
                 <br />
-                three worlds in sync
+                four worlds in sync
               </h2>
 
               <p className="lede">
                 Students graduate with skills that are hard to present in a
                 structured way. Colleges need better visibility into industry
-                demand. Recruiters need a faster way to identify relevant
-                talent. SkillBridge connects all three through one shared skill
-                ecosystem.
+                demand. Faculty need stronger, more direct ties to industry
+                for research and professional growth. Recruiters need a
+                faster way to identify relevant talent. SkillBridge connects
+                all four through one shared skill ecosystem.
               </p>
             </div>
 
@@ -589,6 +617,43 @@ function Landing() {
                     Understand student readiness, compare academic talent with
                     industry demand and identify training areas that can improve
                     placement outcomes.
+                  </p>
+                </div>
+              </div>
+
+              {/* FACULTY */}
+              <div className={pillarClass("pillar-blue", "faculty")}>
+                <button
+                  type="button"
+                  className="pillar-icon"
+                  aria-label="Highlight faculty role"
+                  onClick={() =>
+                    setSelectedPillar((current) =>
+                      current === "faculty" ? null : "faculty"
+                    )
+                  }
+                >
+                  <svg
+                    viewBox="0 0 24 20"
+                    width="20"
+                    height="17"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 1 1 6.5l11 5.5 11-5.5Z" />
+                    <path d="M5 9v5.5c0 1.7 3.1 3 7 3s7-1.3 7-3V9" />
+                  </svg>
+                </button>
+
+                <div>
+                  <h3>Faculty</h3>
+                  <p>
+                    Connect with industry for professional development,
+                    research collaboration and consultancy, and get visibility
+                    into the skills shaping student outcomes.
                   </p>
                 </div>
               </div>
@@ -859,8 +924,9 @@ function Landing() {
 
                 <p className="lede">
                   Your next opportunity is one connection away. Whether
-                  you&apos;re a student, college or recruiter, SkillBridge is
-                  designed to bring the right people and skills together.
+                  you&apos;re a student, college, faculty member or recruiter,
+                  SkillBridge is designed to bring the right people and
+                  skills together.
                 </p>
               </div>
 
@@ -888,7 +954,7 @@ function Landing() {
         <footer className="footer">
           <span>© 2026 SkillBridge</span>
           <span>
-            Built for students, colleges &amp; recruiters — together.
+            Built for students, colleges, faculty &amp; recruiters — together.
           </span>
         </footer>
       </div>
