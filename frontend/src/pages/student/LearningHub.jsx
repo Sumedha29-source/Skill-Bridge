@@ -65,6 +65,12 @@ function LearningHub() {
   const [opportunitySkills, setOpportunitySkills] = useState([]);
   const [trainingPrograms, setTrainingPrograms] = useState([]);
 
+  /*
+   * Contains the IDs of skills for which at least
+   * one assessment question exists.
+   */
+  const [assessableSkillIds, setAssessableSkillIds] = useState([]);
+
   /* =====================================================
      LOAD DATA
   ===================================================== */
@@ -88,7 +94,7 @@ function LearningHub() {
         }
 
         /* =================================================
-           1. LOAD STUDENT PROFILE
+           1. STUDENT PROFILE
         ================================================= */
 
         const { data: profileData, error: profileError } = await supabase
@@ -116,7 +122,7 @@ function LearningHub() {
         }
 
         /* =================================================
-           2. LOAD ALL REQUIRED DATA
+           2. LOAD LEARNING HUB DATA
         ================================================= */
 
         const [
@@ -125,8 +131,15 @@ function LearningHub() {
           opportunitiesResult,
           opportunitySkillsResult,
           trainingResult,
+          assessmentQuestionsResult,
         ] = await Promise.all([
-          supabase.from("skills").select("id, name, category, description"),
+          /* ALL SKILLS */
+
+          supabase
+            .from("skills")
+            .select("id, name, category, description"),
+
+          /* STUDENT'S CURRENT SKILLS */
 
           supabase
             .from("student_skills")
@@ -142,6 +155,8 @@ function LearningHub() {
             )
             .eq("student_id", profileData.id),
 
+          /* OPEN OPPORTUNITIES */
+
           supabase
             .from("opportunities")
             .select(
@@ -153,6 +168,8 @@ function LearningHub() {
             `
             )
             .eq("status", "open"),
+
+          /* OPPORTUNITY SKILL REQUIREMENTS */
 
           supabase
             .from("opportunity_skills")
@@ -166,6 +183,8 @@ function LearningHub() {
               weight
             `
             ),
+
+          /* AVAILABLE TRAINING */
 
           supabase
             .from("training_programs")
@@ -189,7 +208,17 @@ function LearningHub() {
             .order("created_at", {
               ascending: false,
             }),
+
+          /* AVAILABLE ASSESSMENTS */
+
+          supabase
+            .from("assessment_questions")
+            .select("skill_id"),
         ]);
+
+        /* =================================================
+           3. ERROR CHECKING
+        ================================================= */
 
         if (skillsResult.error) {
           throw skillsResult.error;
@@ -211,15 +240,41 @@ function LearningHub() {
           throw trainingResult.error;
         }
 
+        if (assessmentQuestionsResult.error) {
+          throw assessmentQuestionsResult.error;
+        }
+
         if (cancelled) {
           return;
         }
 
+        /* =================================================
+           4. BUILD ASSESSABLE SKILL LIST
+        ================================================= */
+
+        const availableAssessmentSkills = [
+          ...new Set(
+            (assessmentQuestionsResult.data || [])
+              .map((question) => question.skill_id)
+              .filter(Boolean)
+          ),
+        ];
+
+        /* =================================================
+           5. SAVE DATA
+        ================================================= */
+
         setSkills(skillsResult.data || []);
+
         setStudentSkills(studentSkillsResult.data || []);
+
         setOpportunities(opportunitiesResult.data || []);
+
         setOpportunitySkills(opportunitySkillsResult.data || []);
+
         setTrainingPrograms(trainingResult.data || []);
+
+        setAssessableSkillIds(availableAssessmentSkills);
       } catch (loadError) {
         console.error("Learning Hub load error:", loadError);
 
@@ -272,11 +327,21 @@ function LearningHub() {
   }, [studentSkills]);
 
   /* =====================================================
+     ASSESSMENT LOOKUP
+  ===================================================== */
+
+  const assessableSkillSet = useMemo(() => {
+    return new Set(assessableSkillIds);
+  }, [assessableSkillIds]);
+
+  /* =====================================================
      OPEN OPPORTUNITY IDS
   ===================================================== */
 
   const openOpportunityIds = useMemo(() => {
-    return new Set(opportunities.map((opportunity) => opportunity.id));
+    return new Set(
+      opportunities.map((opportunity) => opportunity.id)
+    );
   }, [opportunities]);
 
   /* =====================================================
@@ -310,11 +375,9 @@ function LearningHub() {
         ] || 1;
 
       /*
-       * If the student's current proficiency already meets
-       * or exceeds the opportunity requirement, this is not
-       * considered a skill gap.
+       * Student already meets or exceeds the
+       * requested proficiency.
        */
-
       if (studentLevel >= requiredLevel) {
         return;
       }
@@ -370,10 +433,16 @@ function LearningHub() {
         opportunityCount: gap.opportunityIds.size,
       }))
       .sort((a, b) => {
+        /*
+         * Required skills first.
+         */
         if (b.requiredCount !== a.requiredCount) {
           return b.requiredCount - a.requiredCount;
         }
 
+        /*
+         * Then higher platform demand.
+         */
         if (b.demandWeight !== a.demandWeight) {
           return b.demandWeight - a.demandWeight;
         }
@@ -420,6 +489,8 @@ function LearningHub() {
 
           gap,
 
+          hasAssessment: assessableSkillSet.has(program.skill_id),
+
           recommendationScore:
             gap.demandWeight +
             gap.requiredCount * 5 +
@@ -429,7 +500,12 @@ function LearningHub() {
       .sort((a, b) => {
         return b.recommendationScore - a.recommendationScore;
       });
-  }, [trainingPrograms, skillGapMap, skillMap]);
+  }, [
+    trainingPrograms,
+    skillGapMap,
+    skillMap,
+    assessableSkillSet,
+  ]);
 
   /* =====================================================
      OTHER AVAILABLE TRAINING
@@ -444,8 +520,15 @@ function LearningHub() {
         ...program,
 
         skill: skillMap[program.skill_id],
+
+        hasAssessment: assessableSkillSet.has(program.skill_id),
       }));
-  }, [trainingPrograms, skillGapMap, skillMap]);
+  }, [
+    trainingPrograms,
+    skillGapMap,
+    skillMap,
+    assessableSkillSet,
+  ]);
 
   /* =====================================================
      SUMMARY
@@ -465,7 +548,11 @@ function LearningHub() {
 
       gapsWithTraining: coveredGapIds.size,
     };
-  }, [trainingPrograms, skillGaps, recommendedPrograms]);
+  }, [
+    trainingPrograms,
+    skillGaps,
+    recommendedPrograms,
+  ]);
 
   /* =====================================================
      NAVIGATION
@@ -477,6 +564,10 @@ function LearningHub() {
 
   function goToRoadmap() {
     navigate("/student/roadmap");
+  }
+
+  function goToAssessmentCentre() {
+    navigate("/student/assessment");
   }
 
   /* =====================================================
@@ -573,7 +664,7 @@ function LearningHub() {
       </section>
 
       {/* =================================================
-          SUMMARY CARDS
+          SUMMARY
       ================================================= */}
 
       <section className="learning-summary-grid">
@@ -828,6 +919,10 @@ function LearningHub() {
                     </div>
                   </div>
 
+                  {/* =====================================
+                      ACTIONS
+                  ===================================== */}
+
                   <div className="learning-program-actions">
                     <button
                       type="button"
@@ -837,15 +932,25 @@ function LearningHub() {
                       View roadmap
                     </button>
 
-                    <button
-                      type="button"
-                      className="learning-primary-button"
-                      onClick={() =>
-                        goToAssessment(program.skill_id)
-                      }
-                    >
-                      Take assessment →
-                    </button>
+                    {program.hasAssessment ? (
+                      <button
+                        type="button"
+                        className="learning-primary-button"
+                        onClick={() =>
+                          goToAssessment(program.skill_id)
+                        }
+                      >
+                        Take assessment →
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="learning-secondary-button"
+                        onClick={goToAssessmentCentre}
+                      >
+                        Assessment not available
+                      </button>
+                    )}
                   </div>
                 </article>
               );
@@ -886,11 +991,12 @@ function LearningHub() {
         ) : (
           <div className="learning-gap-list">
             {skillGaps.map((gap, index) => {
-              const hasTraining =
-                recommendedPrograms.some(
-                  (program) =>
-                    program.skill_id === gap.skillId
-                );
+              const hasTraining = recommendedPrograms.some(
+                (program) => program.skill_id === gap.skillId
+              );
+
+              const hasAssessment =
+                assessableSkillSet.has(gap.skillId);
 
               return (
                 <article
@@ -909,9 +1015,7 @@ function LearningHub() {
                     <span>
                       {gap.requiredCount > 0
                         ? `${gap.requiredCount} required requirement${
-                            gap.requiredCount === 1
-                              ? ""
-                              : "s"
+                            gap.requiredCount === 1 ? "" : "s"
                           }`
                         : "Preferred skill requirement"}
                     </span>
@@ -941,10 +1045,17 @@ function LearningHub() {
                     className={`learning-training-status ${
                       hasTraining ? "available" : ""
                     }`}
+                    title={
+                      hasAssessment
+                        ? "SkillBridge assessment available"
+                        : "No SkillBridge assessment is currently available for this skill"
+                    }
                   >
                     {hasTraining
                       ? "TRAINING AVAILABLE"
-                      : "NO TRAINING YET"}
+                      : hasAssessment
+                        ? "ASSESSMENT AVAILABLE"
+                        : "DEVELOPMENT GAP"}
                   </div>
                 </article>
               );
@@ -1066,8 +1177,9 @@ function LearningHub() {
             </strong>
 
             <p>
-              Demonstrate your proficiency through
-              SkillBridge assessment.
+              Where an assessment is available,
+              demonstrate your proficiency through
+              SkillBridge.
             </p>
           </div>
 

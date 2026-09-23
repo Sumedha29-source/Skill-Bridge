@@ -278,10 +278,10 @@ function Landing() {
               <div className="eyebrow">// connecting four worlds</div>
 
               <h1>
-                Bridging <span className="role-student">Students</span>,
+                Bridging <span className="role-student">Students</span> &amp;{" "}
+                <span className="role-faculty">Faculty</span>,
                 <br />
-                <span className="role-college">Colleges</span>,{" "}
-                <span className="role-faculty">Faculty</span> &amp;{" "}
+                <span className="role-college">Colleges</span> &amp;{" "}
                 <span className="role-recruiter">Recruiters</span>
                 <br />
                 Together
@@ -289,7 +289,7 @@ function Landing() {
 
               <p className="lede">
                 One network where talent, education and opportunity meet — so
-                students grow, colleges empower, faculty collaborate, and
+                students grow, faculty advance, colleges empower, and
                 recruiters discover what&apos;s next.
               </p>
 
@@ -299,14 +299,14 @@ function Landing() {
                   student
                 </span>
 
-                <span className="tag ty">
-                  <span className="sw"></span>
-                  college
-                </span>
-
                 <span className="tag tb">
                   <span className="sw"></span>
                   faculty
+                </span>
+
+                <span className="tag ty">
+                  <span className="sw"></span>
+                  college
                 </span>
 
                 <span className="tag tr">
@@ -405,18 +405,40 @@ function Landing() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M12 3 2 8l10 5 8-4v6" />
-                    <path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5" />
+                    <rect x="2" y="6" width="20" height="14" rx="2" />
+                    <path d="M8 6V4.5C8 3.5 8.8 3 10 3h4c1.2 0 2 .5 2 1.5V6" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                  </svg>
+                  Recruiters
+                </div>
+
+                <div className="m-val">86</div>
+
+                <div className="m-foot">Companies actively hiring</div>
+              </div>
+
+              <div className="mtile reveal">
+                <div className="m-label">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 5c3-1.3 6-1.3 8 0v14c-2-1.3-5-1.3-8 0V5Z" />
+                    <path d="M20 5c-3-1.3-6-1.3-8 0v14c2-1.3 5-1.3 8 0V5Z" />
                   </svg>
                   Faculty
                 </div>
 
-                <div className="m-val">1.2K</div>
+                <div className="m-val">540</div>
 
-                <div className="m-foot">Academicians on the platform</div>
+                <div className="m-foot">Faculty members connected</div>
               </div>
 
-              <div className="mtile reveal">
+              <div className="mtile wide reveal">
                 <div className="m-label">
                   <svg
                     viewBox="0 0 24 24"
@@ -434,28 +456,6 @@ function Landing() {
                 <div className="m-val">947</div>
 
                 <div className="m-foot">Shortlists sent this week</div>
-              </div>
-
-              <div className="mtile reveal">
-                <div className="m-label">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="6" width="20" height="14" rx="2" />
-                    <path d="M8 6V4.5C8 3.5 8.8 3 10 3h4c1.2 0 2 .5 2 1.5V6" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                  </svg>
-                  Recruiters
-                </div>
-
-                <div className="m-val">86</div>
-
-                <div className="m-foot">Companies actively hiring</div>
               </div>
             </div>
           </div>
@@ -532,11 +532,11 @@ function Landing() {
 
               <p className="lede">
                 Students graduate with skills that are hard to present in a
-                structured way. Colleges need better visibility into industry
-                demand. Faculty need stronger, more direct ties to industry
-                for research and professional growth. Recruiters need a
-                faster way to identify relevant talent. SkillBridge connects
-                all four through one shared skill ecosystem.
+                structured way. Faculty need better channels to turn expertise
+                into industry collaboration. Colleges need better visibility
+                into industry demand. Recruiters need a faster way to
+                identify relevant talent. SkillBridge connects all four
+                through one shared skill ecosystem.
               </p>
             </div>
 
@@ -621,43 +621,6 @@ function Landing() {
                 </div>
               </div>
 
-              {/* FACULTY */}
-              <div className={pillarClass("pillar-blue", "faculty")}>
-                <button
-                  type="button"
-                  className="pillar-icon"
-                  aria-label="Highlight faculty role"
-                  onClick={() =>
-                    setSelectedPillar((current) =>
-                      current === "faculty" ? null : "faculty"
-                    )
-                  }
-                >
-                  <svg
-                    viewBox="0 0 24 20"
-                    width="20"
-                    height="17"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 1 1 6.5l11 5.5 11-5.5Z" />
-                    <path d="M5 9v5.5c0 1.7 3.1 3 7 3s7-1.3 7-3V9" />
-                  </svg>
-                </button>
-
-                <div>
-                  <h3>Faculty</h3>
-                  <p>
-                    Connect with industry for professional development,
-                    research collaboration and consultancy, and get visibility
-                    into the skills shaping student outcomes.
-                  </p>
-                </div>
-              </div>
-
               {/* RECRUITER */}
               <div className={pillarClass("pillar-red", "recruiter")}>
                 <button
@@ -695,6 +658,43 @@ function Landing() {
                   </p>
                 </div>
               </div>
+
+              {/* FACULTY */}
+              <div className={pillarClass("pillar-blue", "faculty")}>
+                <button
+                  type="button"
+                  className="pillar-icon"
+                  aria-label="Highlight faculty role"
+                  onClick={() =>
+                    setSelectedPillar((current) =>
+                      current === "faculty" ? null : "faculty"
+                    )
+                  }
+                >
+                  <svg
+                    viewBox="0 0 24 22"
+                    width="19"
+                    height="17"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 4c3-1.3 6-1.3 8 0v15c-2-1.3-5-1.3-8 0V4Z" />
+                    <path d="M20 4c-3-1.3-6-1.3-8 0v15c2-1.3 5-1.3 8 0V4Z" />
+                  </svg>
+                </button>
+
+                <div>
+                  <h3>Faculty</h3>
+                  <p>
+                    Connect with industry for professional development,
+                    research collaboration and consultancy — while feeding
+                    expertise back into the skill ecosystem.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -715,48 +715,214 @@ function Landing() {
 
               <p className="lede">
                 One connected system for skill mapping, opportunity matching
-                and academia-industry collaboration.
+                and academia-industry collaboration — everything each of the
+                four portals actually does.
               </p>
             </div>
 
-            <div className="feature-grid">
-              <div className="feature-card reveal">
-                <div className="f-index">01</div>
-                <h3>Resume Intelligence</h3>
-                <p>
-                  Upload a resume and SkillBridge extracts relevant skills,
-                  projects and experience to build a structured student
-                  profile.
-                </p>
+            {/* STUDENT */}
+            <div className="feature-group">
+              <div className="feature-group-head">
+                <span className="dot green"></span>
+                <h4>For students</h4>
               </div>
 
-              <div className="feature-card reveal">
-                <div className="f-index">02</div>
-                <h3>Skill Gap Mapping</h3>
-                <p>
-                  Compare student skills with current industry requirements and
-                  identify the areas students and colleges should focus on.
-                </p>
+              <div className="feature-grid">
+                <div className="feature-card fc-green reveal">
+                  <div className="f-index">01</div>
+                  <h3>Resume Intelligence</h3>
+                  <p>
+                    Upload a resume and SkillBridge extracts relevant skills,
+                    projects and experience to build a structured student
+                    profile.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-green reveal">
+                  <div className="f-index">02</div>
+                  <h3>Skill Assessment</h3>
+                  <p>
+                    Take skill-specific assessments so your proficiency
+                    levels are backed by more than a self-rating.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-green reveal">
+                  <div className="f-index">03</div>
+                  <h3>Skill Roadmap</h3>
+                  <p>
+                    Build a focused roadmap for any opportunity, tracking
+                    exactly which skills close the gap to a stronger match.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-green reveal">
+                  <div className="f-index">04</div>
+                  <h3>Opportunity Matching</h3>
+                  <p>
+                    SkillBridge checks eligibility first, then ranks every
+                    opportunity against your saved skills and proficiency
+                    levels.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-green reveal">
+                  <div className="f-index">05</div>
+                  <h3>Internship Progress Tracking</h3>
+                  <p>
+                    Follow every milestone of an internship once a match
+                    turns into an offer.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* RECRUITER */}
+            <div className="feature-group">
+              <div className="feature-group-head">
+                <span className="dot red"></span>
+                <h4>For recruiters</h4>
               </div>
 
-              <div className="feature-card reveal">
-                <div className="f-index">03</div>
-                <h3>Smart Candidate Matching</h3>
-                <p>
-                  Recruiters define eligibility and required skills.
-                  SkillBridge filters eligible students and ranks candidates
-                  based on their fit for the opportunity.
-                </p>
+              <div className="feature-grid">
+                <div className="feature-card fc-red reveal">
+                  <div className="f-index">06</div>
+                  <h3>Opportunity Management</h3>
+                  <p>
+                    Post, edit and publish hiring roles, then control exactly
+                    when they open for student eligibility matching.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-red reveal">
+                  <div className="f-index">07</div>
+                  <h3>Smart Candidate Matching</h3>
+                  <p>
+                    Define eligibility and required skills, and SkillBridge
+                    filters and ranks candidates by fit automatically.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-red reveal">
+                  <div className="f-index">08</div>
+                  <h3>Candidate Review &amp; Shortlisting</h3>
+                  <p>
+                    Review every applicant&apos;s profile and resume, then
+                    shortlist candidates for the next hiring stage.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-red reveal">
+                  <div className="f-index">09</div>
+                  <h3>Recruitment Analytics</h3>
+                  <p>
+                    Track hiring funnel performance across every opportunity
+                    you&apos;ve posted.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-red reveal">
+                  <div className="f-index">10</div>
+                  <h3>Faculty Collaboration Postings</h3>
+                  <p>
+                    Publish faculty development, research and consultancy
+                    opportunities straight to academia.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* COLLEGE */}
+            <div className="feature-group">
+              <div className="feature-group-head">
+                <span className="dot yellow"></span>
+                <h4>For colleges</h4>
               </div>
 
-              <div className="feature-card reveal">
-                <div className="f-index">04</div>
-                <h3>Personalized Roadmaps</h3>
-                <p>
-                  Students can see the skills missing from their target
-                  opportunity and receive a focused learning roadmap to improve
-                  their match score.
-                </p>
+              <div className="feature-grid">
+                <div className="feature-card fc-yellow reveal">
+                  <div className="f-index">11</div>
+                  <h3>Department Setup</h3>
+                  <p>
+                    Configure the academic departments that every student
+                    record in your institution is built on.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-yellow reveal">
+                  <div className="f-index">12</div>
+                  <h3>Student Oversight</h3>
+                  <p>
+                    Monitor student academic profiles, verification status
+                    and institutional readiness from one place.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-yellow reveal">
+                  <div className="f-index">13</div>
+                  <h3>Skill Gap Mapping</h3>
+                  <p>
+                    Compare skills requested by live opportunities against
+                    recorded, verified student skills to see exactly where
+                    the gaps are.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-yellow reveal">
+                  <div className="f-index">14</div>
+                  <h3>Training Recommendations</h3>
+                  <p>
+                    Turn identified academia-industry skill gaps into
+                    targeted workshops, courses and certifications.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-yellow reveal">
+                  <div className="f-index">15</div>
+                  <h3>Institution Analytics</h3>
+                  <p>
+                    Track institution-wide student readiness and placement
+                    trends over time.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* FACULTY */}
+            <div className="feature-group">
+              <div className="feature-group-head">
+                <span className="dot blue"></span>
+                <h4>For faculty</h4>
+              </div>
+
+              <div className="feature-grid">
+                <div className="feature-card fc-blue reveal">
+                  <div className="f-index">16</div>
+                  <h3>Faculty Profile</h3>
+                  <p>
+                    Maintain your academic expertise, research interests and
+                    professional information for industry collaboration.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-blue reveal">
+                  <div className="f-index">17</div>
+                  <h3>Opportunity Discovery</h3>
+                  <p>
+                    Discover faculty development programmes, research
+                    collaborations and consultancy work posted directly by
+                    industry.
+                  </p>
+                </div>
+
+                <div className="feature-card fc-blue reveal">
+                  <div className="f-index">18</div>
+                  <h3>Application Tracking</h3>
+                  <p>
+                    Track your faculty development, research and training
+                    applications from submission through to outcome.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -924,7 +1090,7 @@ function Landing() {
 
                 <p className="lede">
                   Your next opportunity is one connection away. Whether
-                  you&apos;re a student, college, faculty member or recruiter,
+                  you&apos;re a student, faculty, college or recruiter,
                   SkillBridge is designed to bring the right people and
                   skills together.
                 </p>
@@ -954,7 +1120,8 @@ function Landing() {
         <footer className="footer">
           <span>© 2026 SkillBridge</span>
           <span>
-            Built for students, colleges, faculty &amp; recruiters — together.
+            Built for students, faculty, colleges &amp; recruiters —
+            together.
           </span>
         </footer>
       </div>

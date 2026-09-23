@@ -30,6 +30,7 @@ import SkillGapMap from "./pages/college/SkillGapMap";
 import Training from "./pages/college/Training";
 import Analytics from "./pages/college/Analytics";
 import PortfolioVerification from "./pages/college/PortfolioVerification";
+import PlacementMonitoring from "./pages/college/PlacementMonitoring";
 
 /* =========================
    STUDENT PAGES
@@ -41,6 +42,8 @@ import Assessment from "./pages/student/Assessment";
 import TakeAssessment from "./pages/student/TakeAssessment";
 import CareerGuidance from "./pages/student/CareerGuidance";
 import SkillRoadmap from "./pages/student/SkillRoadmap";
+import LearningHub from "./pages/student/LearningHub";
+import Applications from "./pages/student/Applications";
 import StudentInternshipTracking from "./pages/student/InternshipTracking";
 import Portfolio from "./pages/student/Portfolio";
 
@@ -172,6 +175,13 @@ function App() {
             element={<StudentOpportunities />}
           />
 
+          {/* APPLICATION TRACKING */}
+
+          <Route
+            path="applications"
+            element={<Applications />}
+          />
+
           {/* CAREER GUIDANCE */}
 
           <Route
@@ -184,6 +194,13 @@ function App() {
           <Route
             path="roadmap"
             element={<SkillRoadmap />}
+          />
+
+          {/* LEARNING HUB */}
+
+          <Route
+            path="learning"
+            element={<LearningHub />}
           />
 
           {/* INTERNSHIP PROGRESS */}
@@ -318,7 +335,7 @@ function App() {
             element={<Students />}
           />
 
-          {/* OPTIONAL PORTFOLIO VERIFICATION */}
+          {/* PORTFOLIO VERIFICATION */}
 
           <Route
             path="portfolio-verification"
@@ -344,6 +361,13 @@ function App() {
           <Route
             path="training"
             element={<Training />}
+          />
+
+          {/* PLACEMENT & INTERNSHIP MONITORING */}
+
+          <Route
+            path="placement-monitoring"
+            element={<PlacementMonitoring />}
           />
         </Route>
 
